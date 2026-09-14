@@ -1,138 +1,138 @@
-import Link from "next/link";
-import Header from "@/components/Header";
-import { createClient } from "@/lib/supabase/server";
+'use client';
 
-export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+import { useState } from 'react';
+import Sidebar from '@/components/dashboard/Sidebar';
+import HeaderBar from '@/components/dashboard/HeaderBar';
+import GTDStateOverview from '@/components/dashboard/GTDStateOverview';
+import OmniCaptureBar from '@/components/dashboard/OmniCaptureBar';
+import VelocityChart from '@/components/dashboard/VelocityChart';
+import TodaysWinning from '@/components/dashboard/TodaysWinning';
+import ScheduleAgenda from '@/components/dashboard/ScheduleAgenda';
+import MobileFrameWrapper from '@/components/dashboard/MobileFrameWrapper';
+import Link from 'next/link';
+
+export default function Home() {
+  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
-      <Header />
-
-      <main className="flex-1 max-w-2xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center space-y-6">
-        <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-8 shadow-2xl space-y-8">
-          <div className="flex items-center justify-between pb-6 border-b border-neutral-800">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-lg">
-                🧠
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">Second Brain</h1>
-                <p className="text-xs text-neutral-400">Personal Knowledge & GTD System</p>
-              </div>
-            </div>
-
-            <form action="/auth/logout" method="post">
-              <button
-                type="submit"
-                className="px-4 py-2 text-xs font-semibold rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 hover:text-white transition-colors border border-neutral-700/60"
-              >
-                Keluar (Logout)
-              </button>
-            </form>
-          </div>
-
-          <div className="space-y-4">
-            <div className="bg-emerald-950/30 border border-emerald-800/40 rounded-2xl p-5 text-neutral-200 space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">
-                  Sesi Terautentikasi
-                </p>
-              </div>
-              <p className="text-sm font-medium">
-                Selamat datang kembali, <span className="text-emerald-300 font-mono">{user?.email ?? "Owner"}</span>
-              </p>
-            </div>
-
-            {/* Tombol Aksi Utama */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Link
-                href="/capture"
-                className="flex items-center justify-between p-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all shadow-xl shadow-emerald-950 group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xl group-hover:scale-110 transition-transform">⚡</span>
-                  <div>
-                    <div className="text-sm font-bold">Quick Capture</div>
-                    <div className="text-[11px] text-emerald-100 font-normal">Catat instan offline</div>
-                  </div>
-                </div>
-              </Link>
-
-              <Link
-                href="/inbox"
-                className="flex items-center justify-between p-4 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-semibold transition-all border border-neutral-700/60 group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xl group-hover:scale-110 transition-transform">📥</span>
-                  <div>
-                    <div className="text-sm font-bold">Inbox & Clarify</div>
-                    <div className="text-[11px] text-neutral-400 font-normal">Fokus 1 kartu</div>
-                  </div>
-                </div>
-              </Link>
-
-              <Link
-                href="/items"
-                className="flex items-center justify-between p-4 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-semibold transition-all border border-neutral-700/60 group"
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xl group-hover:scale-110 transition-transform">📋</span>
-                  <div>
-                    <div className="text-sm font-bold">Open Items</div>
-                    <div className="text-[11px] text-neutral-400 font-normal">Daftar kerja aktif</div>
-                  </div>
-                </div>
-              </Link>
-            </div>
-
-            {/* Master Data Navigation */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-              <Link
-                href="/areas"
-                className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-xs text-neutral-200">📁 Areas</span>
-                  <span className="text-neutral-500 group-hover:translate-x-0.5 transition-transform text-xs">➔</span>
-                </div>
-                <div className="text-[11px] text-neutral-400">Lingkup tanggung jawab utama</div>
-              </Link>
-
-              <Link
-                href="/projects"
-                className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-xs text-neutral-200">🎯 Projects</span>
-                  <span className="text-neutral-500 group-hover:translate-x-0.5 transition-transform text-xs">➔</span>
-                </div>
-                <div className="text-[11px] text-neutral-400">Dikelompokkan di bawah Area</div>
-              </Link>
-
-              <Link
-                href="/people"
-                className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold text-xs text-neutral-200">👤 People</span>
-                  <span className="text-neutral-500 group-hover:translate-x-0.5 transition-transform text-xs">➔</span>
-                </div>
-                <div className="text-[11px] text-neutral-400">Questions & Waitings per orang</div>
-              </Link>
-            </div>
-          </div>
-
-          <div className="pt-4 border-t border-neutral-800 flex justify-between items-center text-xs text-neutral-500">
-            <span>Versi 1.0 · Single-User</span>
-            <span>Next.js App Router + Supabase</span>
-          </div>
+    <div className="min-h-screen bg-[#EFF3ED] text-[#19241C] flex">
+      {/* Sidebar Desktop (Hanya muncul jika mode desktop pada layar lebar) */}
+      {viewMode === 'desktop' && (
+        <div className="hidden lg:block">
+          <Sidebar userEmail="lauren@gmail.com" inboxCount={0} />
         </div>
-      </main>
+      )}
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+        {/* Header Bar */}
+        <HeaderBar
+          viewMode={viewMode}
+          onToggleViewMode={setViewMode}
+          userEmail="lauren@gmail.com"
+        />
+
+        {/* Content Render berdasarkan View Mode */}
+        {viewMode === 'desktop' ? (
+          /* ======================================================== */
+          /* DESKTOP VIEW (Layout 3-Kolom sesuai Gambar Referensi)    */
+          /* ======================================================== */
+          <main className="flex-1 p-6 max-w-[1500px] w-full mx-auto space-y-6">
+            {/* 1. GTD State Overview (4 Tiles) */}
+            <GTDStateOverview
+              actionCount={14}
+              waitingCount={5}
+              criticalQuestionsCount={2}
+              top5StreakDays={5}
+            />
+
+            {/* 2. Omni Quick-Capture Bar */}
+            <OmniCaptureBar />
+
+            {/* 3. Main Dashboard 2-Column Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              {/* Left Column (7/12 width): Velocity + Top 5 Winning */}
+              <div className="lg:col-span-7 space-y-6">
+                <VelocityChart />
+                <TodaysWinning />
+              </div>
+
+              {/* Right Column (5/12 width): Schedule & Meeting Agenda */}
+              <div className="lg:col-span-5 space-y-6">
+                <ScheduleAgenda />
+              </div>
+            </div>
+          </main>
+        ) : (
+          /* ======================================================== */
+          /* MOBILE PWA PREVIEW MODE (Simulasi Layar Smartphone HP)   */
+          /* ======================================================== */
+          <MobileFrameWrapper>
+            <div className="space-y-4">
+              {/* Header Profile Singkat */}
+              <div className="flex items-center justify-between bg-white p-3.5 rounded-2xl border border-[#DFE6DC] shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl">🧠</span>
+                  <div>
+                    <h2 className="font-bold text-xs text-[#19241C]">Second Brain</h2>
+                    <p className="text-[10px] text-[#8A978E]">Executive Sanctuary</p>
+                  </div>
+                </div>
+                <Link
+                  href="/capture"
+                  className="px-3 py-1.5 rounded-xl bg-[#072517] text-white text-xs font-bold shadow-sm"
+                >
+                  + Capture
+                </Link>
+              </div>
+
+              {/* Omni Quick-Capture Bar */}
+              <OmniCaptureBar />
+
+              {/* 4 Stat Overview (2x2 Grid) */}
+              <GTDStateOverview
+                actionCount={14}
+                waitingCount={5}
+                criticalQuestionsCount={2}
+                top5StreakDays={5}
+              />
+
+              {/* Top 5 Today's Winning */}
+              <TodaysWinning />
+
+              {/* Schedule & Agenda */}
+              <ScheduleAgenda />
+
+              {/* Bottom Quick Nav Bar */}
+              <div className="grid grid-cols-3 gap-2 pt-2">
+                <Link
+                  href="/capture"
+                  className="p-3 bg-white border border-[#DFE6DC] rounded-xl text-center shadow-xs"
+                >
+                  <div className="text-base">⚡</div>
+                  <div className="text-[10px] font-bold text-[#19241C] mt-0.5">Capture</div>
+                </Link>
+
+                <Link
+                  href="/inbox"
+                  className="p-3 bg-white border border-[#DFE6DC] rounded-xl text-center shadow-xs"
+                >
+                  <div className="text-base">📥</div>
+                  <div className="text-[10px] font-bold text-[#19241C] mt-0.5">Inbox</div>
+                </Link>
+
+                <Link
+                  href="/items"
+                  className="p-3 bg-white border border-[#DFE6DC] rounded-xl text-center shadow-xs"
+                >
+                  <div className="text-base">📋</div>
+                  <div className="text-[10px] font-bold text-[#19241C] mt-0.5">Open Items</div>
+                </Link>
+              </div>
+            </div>
+          </MobileFrameWrapper>
+        )}
+      </div>
     </div>
   );
 }

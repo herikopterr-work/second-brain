@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --canvas-base: #EFF3ED;
+    --surface-card: #FFFFFF;
+    --surface-tint: #F6F8F5;
+    --border-subtle: #DFE6DC;
+    --border-strong: #CBD5C8;
+    --forest-dark: #162B20;
+    --forest-primary: #1E3B2B;
+    --sage-deep: #2E4F3E;
+    --sage-medium: #5B7A66;
+    --sage-soft: #8BA888;
+    --sage-light: #E2EBE0;
+    --text-primary: #19241C;
+    --text-secondary: #58655B;
+    --text-muted: #8A978E;
+    --type-action: #2A5C43;
+    --type-action-bg: #EBF4EE;
+    --type-waiting: #B45309;
+    --type-waiting-bg: #FEF3C7;
+    --type-resource: #2E5C6E;
+    --type-resource-bg: #E0F2FE;
+    --status-critical: #DC2626;
+    --status-critical-bg: #FEE2E2;
+    --capture-banner: #FDF6EA;
+    --capture-border: #EADBCE;
+    --capture-text: #6C593C;
+    --capture-accent: #C27803;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--canvas-base);
+    color: var(--text-primary);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Scrollbar for Executive feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5C8;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8BA888;
 }
