@@ -67,10 +67,10 @@ export default function Header() {
             </span>
           </Link>
 
-          <nav className="flex items-center gap-1 text-xs">
+          <nav className="flex items-center gap-1 text-xs overflow-x-auto py-0.5">
             <Link
               href="/capture"
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
                 pathname === '/capture'
                   ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                   : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
@@ -80,7 +80,7 @@ export default function Header() {
             </Link>
             <Link
               href="/inbox"
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
                 pathname === '/inbox'
                   ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                   : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
@@ -89,8 +89,38 @@ export default function Header() {
               📥 Inbox
             </Link>
             <Link
+              href="/areas"
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+                pathname === '/areas'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+              }`}
+            >
+              📁 Areas
+            </Link>
+            <Link
+              href="/projects"
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+                pathname === '/projects'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+              }`}
+            >
+              🎯 Projects
+            </Link>
+            <Link
+              href="/people"
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+                pathname === '/people'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+              }`}
+            >
+              👤 People
+            </Link>
+            <Link
               href="/"
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
                 pathname === '/'
                   ? 'bg-neutral-800 text-neutral-100'
                   : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'

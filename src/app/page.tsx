@@ -79,19 +79,40 @@ export default async function Home() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+            {/* Master Data Navigation */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
               <Link
-                href="/test-connection"
-                className="p-4 rounded-xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block"
+                href="/areas"
+                className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block group"
               >
-                <div className="font-semibold text-xs text-neutral-200">⚡ Status Database</div>
-                <div className="text-[11px] text-neutral-400">Periksa latensi & koneksi Supabase</div>
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-xs text-neutral-200">📁 Areas</span>
+                  <span className="text-neutral-500 group-hover:translate-x-0.5 transition-transform text-xs">➔</span>
+                </div>
+                <div className="text-[11px] text-neutral-400">Lingkup tanggung jawab utama</div>
               </Link>
 
-              <div className="p-4 rounded-xl bg-neutral-950/60 border border-neutral-800/60 text-neutral-400 space-y-1">
-                <div className="font-semibold text-xs text-neutral-300">📱 Status PWA</div>
-                <div className="text-[11px] text-neutral-500">Offline-ready dengan IndexedDB</div>
-              </div>
+              <Link
+                href="/projects"
+                className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-xs text-neutral-200">🎯 Projects</span>
+                  <span className="text-neutral-500 group-hover:translate-x-0.5 transition-transform text-xs">➔</span>
+                </div>
+                <div className="text-[11px] text-neutral-400">Dikelompokkan di bawah Area</div>
+              </Link>
+
+              <Link
+                href="/people"
+                className="p-4 rounded-2xl bg-neutral-950 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-white transition-all space-y-1 block group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-xs text-neutral-200">👤 People</span>
+                  <span className="text-neutral-500 group-hover:translate-x-0.5 transition-transform text-xs">➔</span>
+                </div>
+                <div className="text-[11px] text-neutral-400">Questions & Waitings per orang</div>
+              </Link>
             </div>
           </div>
 

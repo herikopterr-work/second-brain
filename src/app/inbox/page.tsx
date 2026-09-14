@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import PersonSelect from '@/components/PersonSelect';
 import {
   getInboxData,
   clarifyItem,
@@ -441,31 +442,16 @@ export default function InboxPage() {
                 {/* 4. Pemilih Person (Wajib jika Waiting atau Question) */}
                 {isPersonRequired && (
                   <div className="space-y-2 animate-fade-in p-3.5 rounded-2xl bg-amber-950/20 border border-amber-800/40">
-                    <div className="flex items-center justify-between">
-                      <label className="block text-xs font-semibold uppercase tracking-wider text-amber-300">
-                        4. Terkait Siapa (Person) <span className="text-rose-400">*</span>
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => setShowNewPerson(true)}
-                        className="text-[11px] text-amber-400 hover:underline font-medium"
-                      >
-                        + Orang Baru
-                      </button>
-                    </div>
-
-                    <select
-                      value={selectedPersonId}
-                      onChange={(e) => setSelectedPersonId(e.target.value)}
-                      className="w-full px-3.5 py-3 bg-neutral-950 border border-amber-800/60 rounded-xl text-neutral-100 text-xs focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
-                    >
-                      <option value="">-- Pilih Orang --</option>
-                      {people.map((person) => (
-                        <option key={person.id} value={person.id}>
-                          👤 {person.name} {person.role ? `(${person.role})` : ''}
-                        </option>
-                      ))}
-                    </select>
+                    <PersonSelect
+                      people={people}
+                      selectedPersonId={selectedPersonId}
+                      onSelectPerson={setSelectedPersonId}
+                      required={true}
+                      onPersonCreated={(newP) => {
+                        setPeople((prev) => [...prev, newP as Person].sort((a, b) => a.name.localeCompare(b.name)));
+                      }}
+                      label="4. Terkait Siapa (Person)"
+                    />
                     {selectedType === 'waiting' && (
                       <p className="text-[10px] text-amber-400/80 mt-1">
                         📅 Tanggal <code>waiting_since</code> otomatis diisi hari ini ({new Date().toISOString().split('T')[0]}).
