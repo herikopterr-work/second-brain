@@ -126,15 +126,15 @@ export default function OpenItemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
+    <div className="min-h-screen bg-[#EFF3ED] text-[#19241C] flex flex-col">
       <Header />
 
       <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-6">
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-800">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#DFE6DC]">
           <div>
-            <h1 className="text-xl font-bold tracking-tight">Open Items</h1>
-            <p className="text-xs text-neutral-400 mt-0.5">
+            <h1 className="text-xl font-bold tracking-tight text-[#19241C]">Open Items</h1>
+            <p className="text-xs text-[#5B6B60] mt-0.5">
               Seluruh pekerjaan aktif yang siap dieksekusi atau sedang berjalan.
             </p>
           </div>
@@ -142,13 +142,13 @@ export default function OpenItemsPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/capture"
-              className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition-colors flex items-center gap-1.5 shadow-lg shadow-emerald-950"
+              className="px-3.5 py-2 rounded-xl bg-[#162B20] hover:bg-[#1E3B2B] text-white font-bold text-xs transition-colors flex items-center gap-1.5 shadow-sm"
             >
               <span>⚡ Capture</span>
             </Link>
             <Link
               href="/inbox"
-              className="px-3.5 py-2 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-200 font-semibold text-xs transition-colors border border-neutral-700/60"
+              className="px-3.5 py-2 rounded-xl bg-white hover:bg-[#EFF3ED] text-[#19241C] font-semibold text-xs transition-colors border border-[#DFE6DC]"
             >
               <span>📥 Inbox</span>
             </Link>
@@ -157,11 +157,11 @@ export default function OpenItemsPage() {
 
         {/* Banner Peringatan: Area Uncategorized > 10 */}
         {uncategorizedCount > 10 && (
-          <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-800/60 text-amber-300 text-xs flex items-start gap-3 shadow-xl">
+          <div className="p-4 rounded-2xl bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] text-xs flex items-start gap-3 shadow-sm">
             <span className="text-xl shrink-0">⚠️</span>
             <div className="space-y-1">
               <p className="font-bold text-sm">Peringatan: Area "Uncategorized" menumpuk ({uncategorizedCount} item)!</p>
-              <p className="text-amber-400/90 leading-relaxed">
+              <p className="text-[#92400E]/90 leading-relaxed">
                 Anda memiliki lebih dari 10 item yang belum dipetakan ke Area/Project spesifik. Segera pindahkan ke Project atau Area terkait agar tidak kehilangan konteks pekerjaan.
               </p>
             </div>
@@ -174,72 +174,76 @@ export default function OpenItemsPage() {
             onClick={() => setTypeFilter('all')}
             className={`p-3.5 rounded-2xl border text-left transition-all ${
               typeFilter === 'all'
-                ? 'bg-neutral-900 border-neutral-600 text-neutral-100 ring-1 ring-neutral-500 shadow-md'
-                : 'bg-neutral-900/50 border-neutral-800/80 text-neutral-400 hover:border-neutral-700'
+                ? 'bg-[#162B20] border-[#162B20] text-white shadow-sm ring-2 ring-[#162B20]/30'
+                : 'bg-white border-[#DFE6DC] text-[#5B6B60] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="text-[10px] uppercase font-bold text-neutral-400">Total Aktif</div>
-            <div className="text-xl font-bold text-neutral-100 font-mono mt-0.5">{stats.total}</div>
+            <div className={`text-[10px] uppercase font-bold ${typeFilter === 'all' ? 'text-neutral-300' : 'text-[#5B6B60]'}`}>
+              Total Aktif
+            </div>
+            <div className={`text-xl font-bold font-mono mt-0.5 ${typeFilter === 'all' ? 'text-white' : 'text-[#19241C]'}`}>
+              {stats.total}
+            </div>
           </button>
 
           <button
             onClick={() => setTypeFilter('action')}
             className={`p-3.5 rounded-2xl border text-left transition-all ${
               typeFilter === 'action'
-                ? 'bg-emerald-950/60 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500 shadow-md'
-                : 'bg-neutral-900/50 border-neutral-800/80 text-neutral-400 hover:border-neutral-700'
+                ? 'bg-[#EBF4EE] border-emerald-600 text-[#1E3B2B] ring-2 ring-emerald-500/30 shadow-sm'
+                : 'bg-white border-[#DFE6DC] text-[#5B6B60] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="text-[10px] uppercase font-bold text-emerald-400">ACTION</div>
-            <div className="text-xl font-bold text-emerald-300 font-mono mt-0.5">{stats.action}</div>
+            <div className="text-[10px] uppercase font-bold text-emerald-700">ACTION</div>
+            <div className="text-xl font-bold text-[#1E3B2B] font-mono mt-0.5">{stats.action}</div>
           </button>
 
           <button
             onClick={() => setTypeFilter('waiting')}
             className={`p-3.5 rounded-2xl border text-left transition-all ${
               typeFilter === 'waiting'
-                ? 'bg-amber-950/60 border-amber-500 text-amber-300 ring-1 ring-amber-500 shadow-md'
-                : 'bg-neutral-900/50 border-neutral-800/80 text-neutral-400 hover:border-neutral-700'
+                ? 'bg-[#FEF3C7] border-amber-600 text-[#92400E] ring-2 ring-amber-500/30 shadow-sm'
+                : 'bg-white border-[#DFE6DC] text-[#5B6B60] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="text-[10px] uppercase font-bold text-amber-400">WAITING</div>
-            <div className="text-xl font-bold text-amber-300 font-mono mt-0.5">{stats.waiting}</div>
+            <div className="text-[10px] uppercase font-bold text-amber-700">WAITING</div>
+            <div className="text-xl font-bold text-[#92400E] font-mono mt-0.5">{stats.waiting}</div>
           </button>
 
           <button
             onClick={() => setTypeFilter('resource')}
             className={`p-3.5 rounded-2xl border text-left transition-all ${
               typeFilter === 'resource'
-                ? 'bg-blue-950/60 border-blue-500 text-blue-300 ring-1 ring-blue-500 shadow-md'
-                : 'bg-neutral-900/50 border-neutral-800/80 text-neutral-400 hover:border-neutral-700'
+                ? 'bg-[#E0F2FE] border-blue-600 text-[#0369A1] ring-2 ring-blue-500/30 shadow-sm'
+                : 'bg-white border-[#DFE6DC] text-[#5B6B60] hover:border-[#CBD5E1]'
             }`}
           >
-            <div className="text-[10px] uppercase font-bold text-blue-400">RESOURCE</div>
-            <div className="text-xl font-bold text-blue-300 font-mono mt-0.5">{stats.resource}</div>
+            <div className="text-[10px] uppercase font-bold text-blue-700">RESOURCE</div>
+            <div className="text-xl font-bold text-[#0369A1] font-mono mt-0.5">{stats.resource}</div>
           </button>
         </div>
 
         {/* Filter Controls Bar */}
-        <div className="p-4 bg-neutral-900 border border-neutral-800 rounded-2xl space-y-3 shadow-xl">
+        <div className="p-4 bg-white border border-[#DFE6DC] rounded-3xl space-y-3 shadow-sm">
           {/* Search Text */}
           <input
             type="text"
             placeholder="Cari judul, catatan, atau nama orang..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-neutral-950 border border-neutral-800 rounded-xl text-neutral-100 text-xs focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+            className="w-full px-3.5 py-2.5 bg-[#EFF3ED] border border-[#DFE6DC] rounded-xl text-[#19241C] placeholder-[#9CA3AF] text-xs focus:outline-none focus:border-[#162B20] focus:ring-1 focus:ring-[#162B20]"
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
             {/* Filter Area / Project */}
             <div>
-              <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">
+              <label className="block text-[10px] uppercase font-bold text-[#5B6B60] mb-1">
                 Filter Area / Project
               </label>
               <select
                 value={targetFilter}
                 onChange={(e) => setTargetFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-neutral-100 text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 bg-[#EFF3ED] border border-[#DFE6DC] rounded-xl text-[#19241C] text-xs focus:outline-none focus:border-[#162B20]"
               >
                 <option value="all">-- Semua Area & Project --</option>
                 <optgroup label="── Area ──">
@@ -263,13 +267,13 @@ export default function OpenItemsPage() {
 
             {/* Filter Person */}
             <div>
-              <label className="block text-[10px] uppercase font-bold text-neutral-400 mb-1">
+              <label className="block text-[10px] uppercase font-bold text-[#5B6B60] mb-1">
                 Filter Orang (Person)
               </label>
               <select
                 value={personFilter}
                 onChange={(e) => setPersonFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-neutral-950 border border-neutral-800 rounded-xl text-neutral-100 text-xs focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 bg-[#EFF3ED] border border-[#DFE6DC] rounded-xl text-[#19241C] text-xs focus:outline-none focus:border-[#162B20]"
               >
                 <option value="all">-- Semua Kontak --</option>
                 {people.map((p) => (
@@ -284,11 +288,11 @@ export default function OpenItemsPage() {
 
         {/* Item List */}
         {loading ? (
-          <div className="py-20 text-center text-xs text-neutral-400">Memuat daftar Open Items...</div>
+          <div className="py-20 text-center text-xs text-[#5B6B60]">Memuat daftar Open Items...</div>
         ) : filteredItems.length === 0 ? (
-          <div className="py-16 text-center text-xs text-neutral-500 bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 space-y-3">
-            <p className="text-sm font-semibold text-neutral-300">Tidak ada item yang cocok dengan filter.</p>
-            <p className="text-neutral-500">
+          <div className="py-16 text-center text-xs text-[#5B6B60] bg-white border border-[#DFE6DC] rounded-3xl p-8 space-y-3 shadow-sm">
+            <p className="text-sm font-bold text-[#19241C]">Tidak ada item yang cocok dengan filter.</p>
+            <p className="text-[#5B6B60]">
               Coba ubah kata kunci pencarian atau reset filter di atas.
             </p>
           </div>
@@ -307,10 +311,10 @@ export default function OpenItemsPage() {
               return (
                 <div
                   key={item.id}
-                  className={`p-5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg ${
+                  className={`p-5 rounded-3xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
                     isOverdueWaiting || isOverdueQuestion
-                      ? 'bg-amber-950/20 border-amber-500/40 ring-1 ring-amber-500/20'
-                      : 'bg-neutral-900 border-neutral-800 hover:border-neutral-700'
+                      ? 'bg-[#FEF3C7]/40 border-amber-300 ring-1 ring-amber-300/60'
+                      : 'bg-white border-[#DFE6DC] hover:border-[#CBD5E1]'
                   }`}
                 >
                   <div className="space-y-2.5 flex-1">
@@ -318,12 +322,12 @@ export default function OpenItemsPage() {
                     <div className="flex flex-wrap items-center gap-2 text-[10px]">
                       {/* Tipe Badge */}
                       <span
-                        className={`px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                        className={`px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider ${
                           item.type === 'action'
-                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-[#EBF4EE] text-[#1E3B2B] border border-[#CBE0D1]'
                             : item.type === 'waiting'
-                            ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                            : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                            ? 'bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]'
+                            : 'bg-[#E0F2FE] text-[#0369A1] border border-[#BAE6FD]'
                         }`}
                       >
                         {item.type}
@@ -331,25 +335,25 @@ export default function OpenItemsPage() {
 
                       {/* Subtipe */}
                       {item.subtype && (
-                        <span className="px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-medium capitalize">
+                        <span className="px-2 py-0.5 rounded-md bg-[#EFF3ED] text-[#19241C] border border-[#DFE6DC] font-semibold capitalize">
                           {item.subtype.replace('_', ' ')}
                         </span>
                       )}
 
                       {/* Area / Project */}
                       {item.project_name ? (
-                        <span className="px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-mono">
+                        <span className="px-2 py-0.5 rounded-md bg-[#EFF3ED] text-[#5B6B60] border border-[#DFE6DC] font-mono">
                           🎯 {item.project_name}
                         </span>
                       ) : item.area_name ? (
-                        <span className="px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 font-mono">
+                        <span className="px-2 py-0.5 rounded-md bg-[#EFF3ED] text-[#5B6B60] border border-[#DFE6DC] font-mono">
                           📁 {item.area_name}
                         </span>
                       ) : null}
 
                       {/* Person */}
                       {item.person_name && (
-                        <span className="px-2 py-0.5 rounded-md bg-neutral-800 text-neutral-300 flex items-center gap-1 font-mono">
+                        <span className="px-2 py-0.5 rounded-md bg-[#EFF3ED] text-[#5B6B60] border border-[#DFE6DC] flex items-center gap-1 font-mono">
                           <span>👤</span>
                           <span>{item.person_name}</span>
                         </span>
@@ -357,12 +361,12 @@ export default function OpenItemsPage() {
 
                       {/* Warning Overdue / Sodokan Tag (PRD 5.5) */}
                       {isOverdueWaiting && (
-                        <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] font-bold">
                           ⚡ Perlu ditagih ({daysWaiting} hari)
                         </span>
                       )}
                       {isOverdueQuestion && (
-                        <span className="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-300 border border-rose-500/30 font-bold">
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] font-bold">
                           ⚡ Belum terjawab ({daysCreated} hari)
                         </span>
                       )}
@@ -370,14 +374,14 @@ export default function OpenItemsPage() {
 
                     {/* Judul & Body */}
                     <div className="space-y-1">
-                      <h3 className="font-bold text-sm text-neutral-100 leading-snug">{item.title}</h3>
+                      <h3 className="font-bold text-sm text-[#19241C] leading-snug">{item.title}</h3>
                       {item.body && (
-                        <p className="text-xs text-neutral-400 line-clamp-2">{item.body}</p>
+                        <p className="text-xs text-[#5B6B60] line-clamp-2">{item.body}</p>
                       )}
                     </div>
 
                     {/* Timestamp info */}
-                    <div className="flex items-center gap-3 text-[10px] text-neutral-500 font-mono">
+                    <div className="flex items-center gap-3 text-[10px] text-[#5B6B60] font-mono">
                       <span>Dibuat: {new Date(item.created_at).toLocaleDateString('id-ID')}</span>
                       {item.waiting_since && (
                         <span>Menunggu sejak: {item.waiting_since}</span>
@@ -386,17 +390,17 @@ export default function OpenItemsPage() {
                   </div>
 
                   {/* Actions (Tandai Selesai) */}
-                  <div className="flex items-center gap-2 shrink-0 sm:self-center border-t sm:border-t-0 pt-3 sm:pt-0 border-neutral-800/80">
+                  <div className="flex items-center gap-2 shrink-0 sm:self-center border-t sm:border-t-0 pt-3 sm:pt-0 border-[#DFE6DC]">
                     <button
                       onClick={() => handleDone(item.id)}
-                      className="px-4 py-2 rounded-xl bg-emerald-600/90 hover:bg-emerald-500 text-white font-semibold text-xs transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-950 active:scale-95"
+                      className="px-4 py-2 rounded-xl bg-[#162B20] hover:bg-[#1E3B2B] text-white font-bold text-xs transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
                     >
                       <span>✓ Selesai</span>
                     </button>
 
                     <button
                       onClick={() => handleDelete(item.id, item.title)}
-                      className="p-2 rounded-xl text-neutral-500 hover:text-rose-400 hover:bg-neutral-800 transition-colors text-xs"
+                      className="p-2 rounded-xl text-[#5B6B60] hover:text-rose-600 hover:bg-rose-50 transition-colors text-xs"
                       title="Hapus"
                     >
                       🗑️

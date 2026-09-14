@@ -57,12 +57,12 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/80 px-4 py-3">
-      <div className="max-w-4xl mx-auto flex items-center justify-between">
+    <header className="sticky top-0 z-50 w-full bg-[#EFF3ED]/90 backdrop-blur-md border-b border-[#DFE6DC] px-4 py-3">
+      <div className="max-w-5xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 group">
             <span className="text-xl group-hover:scale-110 transition-transform">🧠</span>
-            <span className="font-bold text-sm tracking-tight text-neutral-100 group-hover:text-emerald-400 transition-colors">
+            <span className="font-bold text-sm tracking-tight text-[#19241C] group-hover:text-[#162B20] transition-colors">
               Second Brain
             </span>
           </Link>
@@ -70,73 +70,73 @@ export default function Header() {
           <nav className="flex items-center gap-1 text-xs overflow-x-auto py-0.5">
             <Link
               href="/capture"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/capture'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
               ⚡ Capture
             </Link>
             <Link
               href="/inbox"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/inbox'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
               📥 Inbox
             </Link>
             <Link
               href="/items"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/items'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
               📋 Open Items
             </Link>
             <Link
               href="/areas"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/areas'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
               📁 Areas
             </Link>
             <Link
               href="/projects"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/projects'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
               🎯 Projects
             </Link>
             <Link
               href="/people"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/people'
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
               👤 People
             </Link>
             <Link
               href="/"
-              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/'
-                  ? 'bg-neutral-800 text-neutral-100'
-                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+                  ? 'bg-white text-[#19241C] border border-[#DFE6DC] shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
               }`}
             >
-              Beranda
+              🏠 Beranda
             </Link>
           </nav>
         </div>
@@ -145,15 +145,15 @@ export default function Header() {
         <div className="flex items-center gap-2.5">
           {/* Status Online/Offline */}
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium border ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
               isOnline
-                ? 'bg-emerald-950/40 border-emerald-800/50 text-emerald-400'
-                : 'bg-amber-950/40 border-amber-800/50 text-amber-400'
+                ? 'bg-[#EBF4EE] border-[#CBE0D1] text-[#1E3B2B]'
+                : 'bg-[#FEF3C7] border-[#FDE68A] text-[#92400E]'
             }`}
           >
             <span
               className={`h-1.5 w-1.5 rounded-full ${
-                isOnline ? 'bg-emerald-400' : 'bg-amber-400 animate-pulse'
+                isOnline ? 'bg-[#1E3B2B]' : 'bg-[#92400E] animate-pulse'
               }`}
             />
             <span>{isOnline ? 'Online' : 'Offline'}</span>
@@ -165,14 +165,14 @@ export default function Header() {
               onClick={handleManualSync}
               disabled={!isOnline || syncing}
               title={isOnline ? 'Klik untuk sinkronkan sekarang' : 'Akan disinkronkan saat online'}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-all cursor-pointer disabled:cursor-default"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#FEF3C7] border border-[#FDE68A] text-[#92400E] hover:bg-[#FDE68A] transition-all cursor-pointer disabled:cursor-default shadow-sm"
             >
               <span className={syncing ? 'animate-spin' : ''}>🔄</span>
               <span>{syncing ? 'Menyinkronkan...' : `${pendingCount} Pending`}</span>
             </button>
           ) : (
-            <div className="hidden sm:flex items-center gap-1 px-2 py-1 text-[11px] text-neutral-500 font-medium">
-              <span className="text-emerald-500">✓</span>
+            <div className="hidden sm:flex items-center gap-1 px-2 py-1 text-[11px] text-[#5B6B60] font-medium">
+              <span className="text-[#162B20] font-bold">✓</span>
               <span>Tersinkron</span>
             </div>
           )}

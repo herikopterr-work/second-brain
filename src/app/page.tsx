@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import HeaderBar from '@/components/dashboard/HeaderBar';
 import GTDStateOverview from '@/components/dashboard/GTDStateOverview';
@@ -9,17 +9,38 @@ import VelocityChart from '@/components/dashboard/VelocityChart';
 import TodaysWinning from '@/components/dashboard/TodaysWinning';
 import ScheduleAgenda from '@/components/dashboard/ScheduleAgenda';
 import MobileFrameWrapper from '@/components/dashboard/MobileFrameWrapper';
+import { getDashboardData, type DashboardData } from '@/lib/dashboard/actions';
 import Link from 'next/link';
 
 export default function Home() {
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      try {
+        setLoading(true);
+        const res = await getDashboardData();
+        setData(res);
+      } catch (err) {
+        console.error('Gagal memuat dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#EFF3ED] text-[#19241C] flex">
-      {/* Sidebar Desktop (Hanya muncul jika mode desktop pada layar lebar) */}
+      {/* Sidebar Desktop */}
       {viewMode === 'desktop' && (
         <div className="hidden lg:block">
-          <Sidebar userEmail="lauren@gmail.com" inboxCount={0} />
+          <Sidebar
+            userEmail={data?.userEmail}
+            inboxCount={data?.inboxCount || 0}
+          />
         </div>
       )}
 
@@ -29,21 +50,19 @@ export default function Home() {
         <HeaderBar
           viewMode={viewMode}
           onToggleViewMode={setViewMode}
-          userEmail="lauren@gmail.com"
+          userEmail={data?.userEmail}
         />
 
         {/* Content Render berdasarkan View Mode */}
         {viewMode === 'desktop' ? (
-          /* ======================================================== */
-          /* DESKTOP VIEW (Layout 3-Kolom sesuai Gambar Referensi)    */
-          /* ======================================================== */
+          /* DESKTOP VIEW */
           <main className="flex-1 p-6 max-w-[1500px] w-full mx-auto space-y-6">
             {/* 1. GTD State Overview (4 Tiles) */}
             <GTDStateOverview
-              actionCount={14}
-              waitingCount={5}
-              criticalQuestionsCount={2}
-              top5StreakDays={5}
+              actionCount={data?.actionCount ?? 14}
+              waitingCount={data?.waitingCount ?? 5}
+              criticalQuestionsCount={data?.criticalQuestionsCount ?? 2}
+              top5StreakDays={data?.top5StreakDays ?? 5}
             />
 
             {/* 2. Omni Quick-Capture Bar */}
@@ -54,19 +73,17 @@ export default function Home() {
               {/* Left Column (7/12 width): Velocity + Top 5 Winning */}
               <div className="lg:col-span-7 space-y-6">
                 <VelocityChart />
-                <TodaysWinning />
+                <TodaysWinning initialItems={data?.todaysWinnings} />
               </div>
 
               {/* Right Column (5/12 width): Schedule & Meeting Agenda */}
               <div className="lg:col-span-5 space-y-6">
-                <ScheduleAgenda />
+                <ScheduleAgenda initialMeetings={data?.scheduleMeetings} />
               </div>
             </div>
           </main>
         ) : (
-          /* ======================================================== */
-          /* MOBILE PWA PREVIEW MODE (Simulasi Layar Smartphone HP)   */
-          /* ======================================================== */
+          /* MOBILE PWA PREVIEW MODE */
           <MobileFrameWrapper>
             <div className="space-y-4">
               {/* Header Profile Singkat */}
@@ -91,17 +108,17 @@ export default function Home() {
 
               {/* 4 Stat Overview (2x2 Grid) */}
               <GTDStateOverview
-                actionCount={14}
-                waitingCount={5}
-                criticalQuestionsCount={2}
-                top5StreakDays={5}
+                actionCount={data?.actionCount ?? 14}
+                waitingCount={data?.waitingCount ?? 5}
+                criticalQuestionsCount={data?.criticalQuestionsCount ?? 2}
+                top5StreakDays={data?.top5StreakDays ?? 5}
               />
 
               {/* Top 5 Today's Winning */}
-              <TodaysWinning />
+              <TodaysWinning initialItems={data?.todaysWinnings} />
 
               {/* Schedule & Agenda */}
-              <ScheduleAgenda />
+              <ScheduleAgenda initialMeetings={data?.scheduleMeetings} />
 
               {/* Bottom Quick Nav Bar */}
               <div className="grid grid-cols-3 gap-2 pt-2">

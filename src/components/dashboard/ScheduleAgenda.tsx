@@ -2,6 +2,16 @@
 
 import { useState } from 'react';
 
+export interface MeetingItem {
+  id: string;
+  title: string;
+  time: string;
+  type: 'WAITING' | 'ACTION' | 'RESOURCE';
+  attendees: { id: string; name: string; monogram: string; color: string }[];
+  additionalMembersCount: number;
+  questions: { id: string; personName: string; text: string; tag: string }[];
+}
+
 const WEEK_DAYS = [
   { dayName: 'Sat', dayNum: '02' },
   { dayName: 'Sun', dayNum: '03' },
@@ -10,10 +20,62 @@ const WEEK_DAYS = [
   { dayName: 'Wed', dayNum: '06' },
 ];
 
-export default function ScheduleAgenda() {
+interface ScheduleAgendaProps {
+  initialMeetings?: MeetingItem[];
+}
+
+export default function ScheduleAgenda({ initialMeetings }: ScheduleAgendaProps) {
   const [selectedDay, setSelectedDay] = useState('04');
   const [activeTab, setActiveTab] = useState<'all' | 'action' | 'waiting'>('all');
-  const [meetingDone, setMeetingDone] = useState(false);
+  const [meetingsDone, setMeetingsDone] = useState<Record<string, boolean>>({});
+
+  const meetings = initialMeetings && initialMeetings.length > 0 ? initialMeetings : [
+    {
+      id: 'm-1',
+      title: 'Weekly Sync Team Lead',
+      time: '10:00 - 10:45 WIB',
+      type: 'WAITING' as const,
+      attendees: [
+        { id: '1', name: 'Agus C.', monogram: 'AC', color: '#2A5C43' },
+        { id: '2', name: 'Rina I.', monogram: 'RI', color: '#B45309' },
+        { id: '3', name: 'Budi S.', monogram: 'BS', color: '#2E5C6E' },
+      ],
+      additionalMembersCount: 2,
+      questions: [
+        { id: 'q-1', personName: 'Agus', text: 'Deadline v2.4 (terbawa 2h)', tag: 'Blocker' },
+        { id: 'q-2', personName: 'Rina', text: 'Budget Datadog Q4', tag: 'Follow-up' },
+      ],
+    },
+    {
+      id: 'm-2',
+      title: 'Workflow Inbox Capture Mobile',
+      time: '14:30 - 16:00 WIB',
+      type: 'RESOURCE' as const,
+      attendees: [],
+      additionalMembersCount: 0,
+      questions: [],
+    },
+    {
+      id: 'm-3',
+      title: 'End of Day Review & Sync',
+      time: '17:00 - 17:45 WIB',
+      type: 'ACTION' as const,
+      attendees: [],
+      additionalMembersCount: 0,
+      questions: [],
+    },
+  ];
+
+  const toggleDone = (id: string) => {
+    setMeetingsDone((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const filteredMeetings = meetings.filter((m) => {
+    if (activeTab === 'all') return true;
+    if (activeTab === 'action' && m.type === 'ACTION') return true;
+    if (activeTab === 'waiting' && m.type === 'WAITING') return true;
+    return false;
+  });
 
   return (
     <div className="bg-white border border-[#DFE6DC] rounded-3xl p-6 shadow-sm space-y-5">
@@ -85,7 +147,7 @@ export default function ScheduleAgenda() {
             }`}
           >
             <span>📑</span>
-            <span>Semua 3</span>
+            <span>Semua {meetings.length}</span>
           </button>
           <button
             onClick={() => setActiveTab('action')}
@@ -96,7 +158,7 @@ export default function ScheduleAgenda() {
             }`}
           >
             <span>✓</span>
-            <span>Action 1</span>
+            <span>Action {meetings.filter((m) => m.type === 'ACTION').length}</span>
           </button>
           <button
             onClick={() => setActiveTab('waiting')}
@@ -107,123 +169,116 @@ export default function ScheduleAgenda() {
             }`}
           >
             <span>⏳</span>
-            <span>Waiting 2</span>
+            <span>Waiting {meetings.filter((m) => m.type === 'WAITING').length}</span>
           </button>
         </div>
       </div>
 
       {/* Meeting Cards List */}
       <div className="space-y-3">
-        {/* Card 1: Weekly Sync (Active / Detailed) */}
-        {(activeTab === 'all' || activeTab === 'waiting') && (
-          <div className="p-4 rounded-2xl bg-[#F6F8F5] border border-[#DFE6DC] space-y-3 shadow-2xs">
-            {/* Top row */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono text-[#58655B] font-semibold">
-                  10:00 - 10:45 WIB
-                </span>
-                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]">
-                  ⏳ WAITING
-                </span>
-              </div>
-              <span className="text-xs text-[#8A978E]">⌃</span>
-            </div>
+        {filteredMeetings.map((m) => {
+          const isDone = meetingsDone[m.id];
+          const isWaiting = m.type === 'WAITING';
 
-            <h4 className="font-bold text-sm text-[#19241C]">Weekly Sync Team Lead</h4>
-
-            {/* Attendees & Google Meet */}
-            <div className="flex items-center justify-between gap-2 pt-1">
-              <div className="flex items-center gap-1 text-[11px] text-[#58655B]">
-                <div className="flex -space-x-1.5">
-                  <span className="w-5 h-5 rounded-full bg-[#2A5C43] text-white text-[9px] font-bold flex items-center justify-center border border-white">
-                    AC
+          return (
+            <div
+              key={m.id}
+              className="p-4 rounded-2xl bg-[#F6F8F5] border border-[#DFE6DC] space-y-3 shadow-2xs transition-all"
+            >
+              {/* Top row */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-mono text-[#58655B] font-semibold">
+                    {m.time}
                   </span>
-                  <span className="w-5 h-5 rounded-full bg-[#B45309] text-white text-[9px] font-bold flex items-center justify-center border border-white">
-                    RI
-                  </span>
-                  <span className="w-5 h-5 rounded-full bg-[#2E5C6E] text-white text-[9px] font-bold flex items-center justify-center border border-white">
-                    BS
+                  <span
+                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                      m.type === 'WAITING'
+                        ? 'bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]'
+                        : m.type === 'ACTION'
+                        ? 'bg-[#EBF4EE] text-[#2A5C43] border border-[#D1E7DD]'
+                        : 'bg-[#E0F2FE] text-[#2E5C6E] border border-[#BAE6FD]'
+                    }`}
+                  >
+                    {m.type}
                   </span>
                 </div>
-                <span className="text-[10px] text-[#8A978E] ml-1">+2 members</span>
+                <span className="text-xs text-[#8A978E]">⌃</span>
               </div>
 
-              <button className="px-2.5 py-1 rounded-lg bg-white border border-[#DFE6DC] text-[10px] font-bold text-[#19241C] flex items-center gap-1 hover:bg-[#F6F8F5]">
-                <span>📹</span>
-                <span>Google Meet</span>
-              </button>
-            </div>
+              <h4 className="font-bold text-sm text-[#19241C]">{m.title}</h4>
 
-            {/* Sub-Card: Questions & Follow-ups (PRD 5.4) */}
-            <div className="p-3 bg-white border border-[#DFE6DC] rounded-xl space-y-2.5">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="font-bold text-[#19241C]">Pertanyaan &amp; Follow-up (PRD 5.4):</span>
-                <span className="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#B45309] text-[10px] font-bold">
-                  2 Waiting
-                </span>
-              </div>
+              {/* Attendees & Video Link */}
+              {m.attendees && m.attendees.length > 0 && (
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  <div className="flex items-center gap-1 text-[11px] text-[#58655B]">
+                    <div className="flex -space-x-1.5">
+                      {m.attendees.map((att) => (
+                        <span
+                          key={att.id}
+                          style={{ backgroundColor: att.color }}
+                          className="w-5 h-5 rounded-full text-white text-[9px] font-bold flex items-center justify-center border border-white"
+                        >
+                          {att.monogram}
+                        </span>
+                      ))}
+                    </div>
+                    {m.additionalMembersCount > 0 && (
+                      <span className="text-[10px] text-[#8A978E] ml-1">
+                        +{m.additionalMembersCount} members
+                      </span>
+                    )}
+                  </div>
 
-              <div className="space-y-1.5 text-xs text-[#19241C]">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="truncate pr-2">• Agus: Deadline v2.4 (terbawa 2h)</span>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FEE2E2] text-[#DC2626]">
-                    Blocker
-                  </span>
+                  <button className="px-2.5 py-1 rounded-lg bg-white border border-[#DFE6DC] text-[10px] font-bold text-[#19241C] flex items-center gap-1 hover:bg-[#F6F8F5]">
+                    <span>📹</span>
+                    <span>Google Meet</span>
+                  </button>
                 </div>
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="truncate pr-2">• Rina: Budget Datadog Q4</span>
-                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-[#FEF3C7] text-[#B45309]">
-                    Follow-up
-                  </span>
+              )}
+
+              {/* Sub-Card: Questions & Follow-ups */}
+              {isWaiting && m.questions && m.questions.length > 0 && (
+                <div className="p-3 bg-white border border-[#DFE6DC] rounded-xl space-y-2.5">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-[#19241C]">Pertanyaan &amp; Follow-up (PRD 5.4):</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#B45309] text-[10px] font-bold">
+                      {m.questions.length} Waiting
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 text-xs text-[#19241C]">
+                    {m.questions.map((q) => (
+                      <div key={q.id} className="flex items-center justify-between text-[11px]">
+                        <span className="truncate pr-2">• {q.personName}: {q.text}</span>
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
+                            q.tag === 'Blocker'
+                              ? 'bg-[#FEE2E2] text-[#DC2626]'
+                              : 'bg-[#FEF3C7] text-[#B45309]'
+                          }`}
+                        >
+                          {q.tag}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    onClick={() => toggleDone(m.id)}
+                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all border ${
+                      isDone
+                        ? 'bg-[#EBF4EE] text-[#2A5C43] border-[#CBD5C8]'
+                        : 'bg-[#F6F8F5] hover:bg-[#EFF3ED] text-[#19241C] border-[#DFE6DC]'
+                    }`}
+                  >
+                    {isDone ? '✓ Ditandai Selesai' : '✓ Tandai Selesai / Terjawab'}
+                  </button>
                 </div>
-              </div>
-
-              <button
-                onClick={() => setMeetingDone(!meetingDone)}
-                className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                  meetingDone
-                    ? 'bg-[#EBF4EE] text-[#2A5C43] border-[#CBD5C8]'
-                    : 'bg-[#F6F8F5] hover:bg-[#EFF3ED] text-[#19241C] border-[#DFE6DC]'
-                }`}
-              >
-                {meetingDone ? '✓ Ditandai Selesai' : '✓ Tandai Selesai / Terjawab'}
-              </button>
+              )}
             </div>
-          </div>
-        )}
-
-        {/* Card 2: Resource */}
-        {(activeTab === 'all' || activeTab === 'action') && (
-          <div className="p-3.5 rounded-2xl bg-white border border-[#DFE6DC] hover:border-[#CBD5C8] transition-all space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="font-mono text-[#58655B]">14:30 - 16:00 WIB</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#E0F2FE] text-[#2E5C6E]">
-                📖 RESOURCE
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <h5 className="font-semibold text-xs text-[#19241C]">Workflow Inbox Capture Mobile</h5>
-              <span className="text-xs text-[#8A978E]">⌄</span>
-            </div>
-          </div>
-        )}
-
-        {/* Card 3: Action */}
-        {(activeTab === 'all' || activeTab === 'action') && (
-          <div className="p-3.5 rounded-2xl bg-white border border-[#DFE6DC] hover:border-[#CBD5C8] transition-all space-y-1">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="font-mono text-[#58655B]">17:00 - 17:45 WIB</span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#EBF4EE] text-[#2A5C43]">
-                ✓ ACTION
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <h5 className="font-semibold text-xs text-[#19241C]">End of Day Review &amp; Sync</h5>
-              <span className="text-xs text-[#8A978E]">⌄</span>
-            </div>
-          </div>
-        )}
+          );
+        })}
       </div>
     </div>
   );

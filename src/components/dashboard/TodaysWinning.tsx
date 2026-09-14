@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import { toggleWinningItemDone } from '@/lib/dashboard/actions';
 
-interface WinningItem {
+export interface WinningItem {
   id: string;
   title: string;
   carryoverTag: string;
@@ -12,59 +13,29 @@ interface WinningItem {
   completed: boolean;
 }
 
-const INITIAL_WINNINGS: WinningItem[] = [
-  {
-    id: 'w-1',
-    title: 'Finalisasi arsitektur skema DB Partitioning PostgreSQL',
-    carryoverTag: '▲ 3 hari terbawa',
-    isCriticalCarryover: true,
-    duration: '90m',
-    dueDate: 'Aug 04',
-    completed: false,
-  },
-  {
-    id: 'w-2',
-    title: 'Review merge request SLA alert pipeline',
-    carryoverTag: 'Hari ke-1',
-    duration: '45m',
-    dueDate: 'Aug 04',
-    completed: false,
-  },
-  {
-    id: 'w-3',
-    title: 'Draft dokumen RFC otentikasi biometric multi-tenant',
-    carryoverTag: 'Hari ke-2',
-    duration: '60m',
-    dueDate: 'Aug 04',
-    completed: false,
-  },
-  {
-    id: 'w-4',
-    title: 'Sinkronisasi ekspektasi roadmap Q4 dengan Product Management',
-    carryoverTag: 'Hari ke-1',
-    duration: '30m',
-    dueDate: 'Aug 04',
-    completed: false,
-  },
-  {
-    id: 'w-5',
-    title: 'Verifikasi checklist audit kepatuhan ISO 27001',
-    carryoverTag: 'Baru',
-    duration: '45m',
-    dueDate: 'Aug 04',
-    completed: false,
-  },
-];
+interface TodaysWinningProps {
+  initialItems?: WinningItem[];
+}
 
-export default function TodaysWinning() {
-  const [items, setItems] = useState<WinningItem[]>(INITIAL_WINNINGS);
+export default function TodaysWinning({ initialItems }: TodaysWinningProps) {
+  const [items, setItems] = useState<WinningItem[]>(initialItems || []);
 
-  const toggleCheck = (id: string) => {
+  const toggleCheck = async (id: string) => {
+    const target = items.find((i) => i.id === id);
+    if (!target) return;
+
+    const newCompleted = !target.completed;
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
+        item.id === id ? { ...item, completed: newCompleted } : item
       )
     );
+
+    try {
+      await toggleWinningItemDone(id, target.completed);
+    } catch (err) {
+      console.error('Gagal update winning item:', err);
+    }
   };
 
   return (
@@ -103,7 +74,6 @@ export default function TodaysWinning() {
           >
             {/* Left Checkbox & Title */}
             <div className="flex items-center gap-3 min-w-0">
-              {/* Circular Custom Checkbox */}
               <button
                 type="button"
                 onClick={(e) => {
@@ -132,7 +102,6 @@ export default function TodaysWinning() {
 
                 {/* Metadata badges row */}
                 <div className="flex items-center gap-2 mt-1.5 text-[10px]">
-                  {/* Carryover Badge */}
                   <span
                     className={`px-1.5 py-0.5 rounded font-bold font-mono ${
                       item.isCriticalCarryover
@@ -145,10 +114,8 @@ export default function TodaysWinning() {
                     {item.carryoverTag}
                   </span>
 
-                  {/* Duration */}
                   <span className="text-[#8A978E] font-mono">{item.duration}</span>
 
-                  {/* Due Date */}
                   <span className="text-[#8A978E] flex items-center gap-1 font-mono">
                     <span>📅</span>
                     <span>{item.dueDate}</span>
