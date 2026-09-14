@@ -38,7 +38,10 @@ export async function updateSession(request: NextRequest) {
   const isPublicRoute =
     pathname.startsWith('/login') ||
     pathname.startsWith('/auth') ||
-    pathname.startsWith('/test-connection');
+    pathname.startsWith('/test-connection') ||
+    pathname === '/manifest.json' ||
+    pathname === '/sw.js' ||
+    pathname.startsWith('/icons');
 
   // Jika belum login dan mengakses halaman terproteksi -> redirect ke /login
   if (!user && !isPublicRoute) {
