@@ -89,6 +89,16 @@ export default function Header() {
               📥 Inbox
             </Link>
             <Link
+              href="/items"
+              className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
+                pathname === '/items'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-900'
+              }`}
+            >
+              📋 Open Items
+            </Link>
+            <Link
               href="/areas"
               className={`px-2.5 py-1.5 rounded-lg font-medium transition-all shrink-0 ${
                 pathname === '/areas'

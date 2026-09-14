@@ -49,33 +49,44 @@ export default async function Home() {
             </div>
 
             {/* Tombol Aksi Utama */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Link
                 href="/capture"
-                className="flex items-center justify-between p-5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all shadow-xl shadow-emerald-950 group"
+                className="flex items-center justify-between p-4 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition-all shadow-xl shadow-emerald-950 group"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">⚡</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl group-hover:scale-110 transition-transform">⚡</span>
                   <div>
-                    <div className="text-base font-bold">Quick Capture</div>
-                    <div className="text-xs text-emerald-100 font-normal">Tulis ide instan offline/online</div>
+                    <div className="text-sm font-bold">Quick Capture</div>
+                    <div className="text-[11px] text-emerald-100 font-normal">Catat instan offline</div>
                   </div>
                 </div>
-                <span className="text-lg group-hover:translate-x-1 transition-transform">➔</span>
               </Link>
 
               <Link
                 href="/inbox"
-                className="flex items-center justify-between p-5 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-semibold transition-all border border-neutral-700/60 group"
+                className="flex items-center justify-between p-4 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-semibold transition-all border border-neutral-700/60 group"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl group-hover:scale-110 transition-transform">📥</span>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl group-hover:scale-110 transition-transform">📥</span>
                   <div>
-                    <div className="text-base font-bold">Inbox & Clarify</div>
-                    <div className="text-xs text-neutral-400 font-normal">Fokus 1 kartu per giliran</div>
+                    <div className="text-sm font-bold">Inbox & Clarify</div>
+                    <div className="text-[11px] text-neutral-400 font-normal">Fokus 1 kartu</div>
                   </div>
                 </div>
-                <span className="text-lg group-hover:translate-x-1 transition-transform">➔</span>
+              </Link>
+
+              <Link
+                href="/items"
+                className="flex items-center justify-between p-4 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-semibold transition-all border border-neutral-700/60 group"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-xl group-hover:scale-110 transition-transform">📋</span>
+                  <div>
+                    <div className="text-sm font-bold">Open Items</div>
+                    <div className="text-[11px] text-neutral-400 font-normal">Daftar kerja aktif</div>
+                  </div>
+                </div>
               </Link>
             </div>
 
