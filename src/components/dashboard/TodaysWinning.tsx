@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toggleWinningItemDone } from '@/lib/dashboard/actions';
+import Link from 'next/link';
+import { Calendar } from 'lucide-react';
 
 export interface WinningItem {
   id: string;
@@ -17,19 +19,76 @@ interface TodaysWinningProps {
   initialItems?: WinningItem[];
 }
 
-export default function TodaysWinning({ initialItems }: TodaysWinningProps) {
-  const [items, setItems] = useState<WinningItem[]>(initialItems || []);
+export default function TodaysWinning({ initialItems = [] }: TodaysWinningProps) {
+  // Default mock items matching Stitch if initialItems is empty
+  const defaultItems: WinningItem[] = [
+    {
+      id: 'w-1',
+      title: 'Finalisasi arsitektur skema DB Partitioning PostgreSQL',
+      carryoverTag: '▲ 3 hari terbawa',
+      isCriticalCarryover: true,
+      duration: '90m',
+      dueDate: 'Aug 04',
+      completed: false,
+    },
+    {
+      id: 'w-2',
+      title: 'Review merge request SLA alert pipeline',
+      carryoverTag: 'Hari ke-1',
+      isCriticalCarryover: false,
+      duration: '45m',
+      dueDate: 'Aug 04',
+      completed: false,
+    },
+    {
+      id: 'w-3',
+      title: 'Draft dokumen RFC otentikasi biometric multi-tenant',
+      carryoverTag: 'Hari ke-2',
+      isCriticalCarryover: false,
+      duration: '60m',
+      dueDate: 'Aug 04',
+      completed: false,
+    },
+    {
+      id: 'w-4',
+      title: 'Sinkronisasi ekspektasi roadmap Q4 dengan Product Management',
+      carryoverTag: 'Hari ke-1',
+      isCriticalCarryover: false,
+      duration: '30m',
+      dueDate: 'Aug 04',
+      completed: false,
+    },
+    {
+      id: 'w-5',
+      title: 'Verifikasi checklist audit kepatuhan ISO 27001',
+      carryoverTag: 'Baru',
+      isCriticalCarryover: false,
+      duration: '45m',
+      dueDate: 'Aug 04',
+      completed: false,
+    },
+  ];
 
-  const toggleCheck = async (id: string) => {
+  const [completedOverrides, setCompletedOverrides] = useState<Record<string, boolean>>({});
+
+  const items: WinningItem[] = (initialItems.length > 0 ? initialItems : defaultItems).map((item) => ({
+    ...item,
+    completed:
+      completedOverrides[item.id] !== undefined
+        ? completedOverrides[item.id]
+        : item.completed,
+  }));
+
+  const toggleCheck = async (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     const target = items.find((i) => i.id === id);
     if (!target) return;
 
     const newCompleted = !target.completed;
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, completed: newCompleted } : item
-      )
-    );
+    setCompletedOverrides((prev) => ({
+      ...prev,
+      [id]: newCompleted,
+    }));
 
     try {
       await toggleWinningItemDone(id, target.completed);
@@ -39,85 +98,85 @@ export default function TodaysWinning({ initialItems }: TodaysWinningProps) {
   };
 
   return (
-    <div className="bg-white border border-[#DFE6DC] rounded-3xl p-6 shadow-sm space-y-4">
+    <div className="bg-surface-elevated rounded-2xl p-unit-lg shadow-sm flex flex-col flex-1 border border-border-subtle h-full">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-[#2A5C43]">🛡️</span>
-          <h3 className="font-bold text-xs uppercase tracking-wider text-[#19241C]">
-            Top 5: Today's Winning
-          </h3>
+      <div className="flex items-center justify-between mb-unit-sm">
+        <div className="flex items-center gap-unit-xs min-w-0">
+          <span className="material-symbols-outlined text-sage-medium text-base">verified_user</span>
+          <span className="text-[13.5px] text-forest-dark truncate font-semibold">
+            Top 5: Today&apos;s Winning
+          </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-lg bg-[#EBF4EE] text-[#2A5C43] text-[11px] font-semibold border border-[#CBD5C8]/60 flex items-center gap-1">
-            <span>🔒</span>
+        <div className="flex items-center gap-unit-xs">
+          <span className="text-[10.5px] font-semibold text-type-action bg-type-action-bg px-unit-xs py-0.5 rounded flex items-center gap-0.5">
+            <span className="material-symbols-outlined text-xs">lock</span>
             <span>Terkunci Hari Ini</span>
           </span>
-          <button className="px-2.5 py-1 rounded-lg bg-[#F6F8F5] hover:bg-[#EFF3ED] text-[#19241C] text-[11px] font-bold border border-[#DFE6DC] transition-colors">
+          <Link
+            href="/items"
+            className="text-[10.5px] font-semibold text-text-secondary bg-surface-container hover:bg-surface-container-high px-unit-xs py-0.5 rounded transition-colors"
+          >
             + Add
-          </button>
+          </Link>
         </div>
       </div>
 
-      {/* Stack Items */}
-      <div className="space-y-2.5">
+      {/* List */}
+      <div className="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto pr-0.5">
         {items.map((item) => (
           <div
             key={item.id}
             onClick={() => toggleCheck(item.id)}
-            className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between gap-3 ${
-              item.completed
-                ? 'bg-[#F6F8F5] border-[#DFE6DC] opacity-60'
-                : 'bg-[#F6F8F5]/80 hover:bg-[#F6F8F5] border-[#DFE6DC] hover:border-[#CBD5C8]'
-            }`}
+            className="group px-unit-md py-2 rounded-xl bg-surface-container-low hover:bg-surface-container transition-all flex items-center justify-between cursor-pointer border border-border-subtle/40 h-[71px] shrink-0"
           >
-            {/* Left Checkbox & Title */}
-            <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center gap-unit-md min-w-0 flex-1">
+              {/* Circular Checkbox */}
               <button
                 type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleCheck(item.id);
-                }}
-                className={`w-5 h-5 rounded-full border flex items-center justify-center transition-all shrink-0 ${
-                  item.completed
-                    ? 'bg-[#1E3B2B] border-[#1E3B2B] text-white text-[10px]'
-                    : 'border-[#8BA888] bg-white hover:border-[#2A5C43]'
-                }`}
+                onClick={(e) => toggleCheck(item.id, e)}
+                className={`w-5 h-5 rounded-full transition-all shrink-0 flex items-center justify-center ${item.completed
+                  ? 'bg-primary text-white'
+                  : 'border-2 border-sage-soft hover:bg-sage-light'
+                  }`}
               >
-                {item.completed && '✓'}
+                {item.completed && (
+                  <span className="material-symbols-outlined text-xs font-bold">check</span>
+                )}
               </button>
 
-              <div className="min-w-0">
-                <p
-                  className={`text-xs font-semibold leading-tight truncate ${
-                    item.completed
-                      ? 'line-through text-[#8A978E]'
-                      : 'text-[#19241C]'
-                  }`}
+              {/* Title & Metadata */}
+              <div className="flex flex-col min-w-0 flex-1 justify-center">
+                <span
+                  className={`text-[13.5px] leading-snug font-medium transition-all line-clamp-2 ${item.completed
+                    ? 'line-through opacity-40 text-text-muted'
+                    : 'text-text-primary'
+                    }`}
                 >
                   {item.title}
-                </p>
+                </span>
 
-                {/* Metadata badges row */}
-                <div className="flex items-center gap-2 mt-1.5 text-[10px]">
+                <div className="flex items-center gap-unit-sm mt-1.5 flex-wrap">
+                  {/* Carryover / Status Badge */}
                   <span
-                    className={`px-1.5 py-0.5 rounded font-bold font-mono ${
-                      item.isCriticalCarryover
-                        ? 'bg-[#FEE2E2] text-[#DC2626] border border-[#FECACA]'
-                        : item.carryoverTag === 'Baru'
-                        ? 'bg-[#EBF4EE] text-[#2A5C43] border border-[#D1E7DD]'
-                        : 'bg-white text-[#58655B] border border-[#DFE6DC]'
-                    }`}
+                    className={`text-[10.5px] font-semibold px-2 py-0.5 rounded-md flex items-center gap-0.5 ${item.isCriticalCarryover || item.carryoverTag.includes('▲')
+                      ? 'bg-status-critical-bg text-status-critical'
+                      : item.carryoverTag === 'Baru'
+                        ? 'bg-secondary-container text-on-secondary-fixed'
+                        : 'bg-surface-container text-text-secondary'
+                      }`}
                   >
                     {item.carryoverTag}
                   </span>
 
-                  <span className="text-[#8A978E] font-mono">{item.duration}</span>
+                  {/* Duration Badge */}
+                  <span className="text-[10.5px] font-semibold text-text-muted bg-surface-elevated px-2 py-0.5 rounded border border-border-subtle/50">
+                    {item.duration}
+                  </span>
 
-                  <span className="text-[#8A978E] flex items-center gap-1 font-mono">
-                    <span>📅</span>
+                  {/* Due Date */}
+                  <span className="text-[11px] font-medium text-text-muted flex items-center gap-1">
+                    <Calendar className="w-3.5 h-3.5 text-text-muted shrink-0" />
                     <span>{item.dueDate}</span>
                   </span>
                 </div>

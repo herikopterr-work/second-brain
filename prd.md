@@ -145,7 +145,7 @@ Area → Project → Item
 |---|---|---|
 | `id` | uuid | PK |
 | `date` | date | unik |
-| `item_ids` | uuid[] | maksimal 3 |
+| `item_ids` | uuid[] | maksimal 5 |
 | `completed_item_ids` | uuid[] | terisi saat item di-done pada tanggal itu |
 | `morning_review_completed_at` | timestamptz | nullable |
 
@@ -237,7 +237,7 @@ Layar berurutan lima langkah, bukan dashboard. Dashboard menuntut pengguna memil
 | 5 | Pilih Top 5 | Carryover sudah terisi; tinggal tambah atau buang |
 
 Kriteria penerimaan:
-- Tombol **Mulai hari** tidak aktif sebelum Inbox kosong dan Top 3 terisi.
+- Tombol **Mulai hari** tidak aktif sebelum Inbox kosong dan Top 5 terisi.
 - Tombol tetap terlihat dalam keadaan mati, disertai alasannya. Menyembunyikannya akan terasa seperti aplikasi rusak.
 - Langkah berikutnya tampil sebagai daftar redup berisi angka. Pengguna tahu apa yang menanti, tapi tidak bisa melompat.
 
@@ -250,7 +250,7 @@ Cermin dari morning review:
 1. Tandai yang selesai hari ini.
 2. Perbarui `WAITING` — ada yang sudah dijawab?
 3. Item overdue — geser tanggal, atau akui bahwa itu bukan prioritas.
-4. Catat satu hal pertama untuk besok, menjadi kandidat Top 3 pagi berikutnya.
+4. Catat satu hal pertama untuk besok, menjadi kandidat Top 5 pagi berikutnya.
 
 ### 5.10 Dashboard
 
@@ -283,7 +283,188 @@ Satu tombol export seluruh data ke JSON dan CSV. Tidak ada fitur restore di UI �
 
 ---
 
-## 6. Non-fungsional
+## 6. UI & Design System
+
+Sistem desain bernama **Cognitive Clarity (Sage Palette)**. Filosofinya: meredam kelelahan mata selama sesi kerja intensif, membedakan status GTD secara visual tanpa warna yang berteriak, dan menjaga ritme layout yang rapi tanpa ruang mati.
+
+Referensi layar yang sudah didesain: Dashboard Desktop dan Inbox & Clarify Hub.
+
+---
+
+### 6.1 Warna
+
+#### Surfaces & Backgrounds
+| Token | Hex | Penggunaan |
+|---|---|---|
+| `canvas-bg` | `#e2e8e3` | Latar dasar kanvas aplikasi |
+| `surface-container-lowest` | `#ffffff` | Kartu utama, sidebar |
+| `surface-container-low` | `#f8faf8` | Sub-area / header nested di dalam kartu |
+| `surface-container-muted` | `#f0f3f0` | Tag, badge netral, input search, hover state |
+| `surface-capture-banner` | `#fceee2` | Kartu Quick Capture (kontras hangat) |
+| `surface-dark-active` | `#2d3b36` | Navigasi aktif sidebar, tanggal kalender aktif |
+
+#### Typography & Text
+| Token | Hex | Penggunaan |
+|---|---|---|
+| `text-primary` | `#1b2420` | Judul utama, angka metrik, label penting |
+| `text-secondary` | `#4a5550` | Deskripsi, label input, status waktu |
+| `text-muted` | `#7a8880` | Placeholder, metadata, breadcrumb |
+| `text-on-dark` | `#ffffff` | Teks di atas elemen aktif gelap |
+| `text-danger-critical` | `#c2410c` | Sodokan > 3 hari, carryover berulang |
+| `text-success` | `#15803d` | Done, Zero Inbox, Streak |
+
+#### Borders
+| Token | Hex | Penggunaan |
+|---|---|---|
+| `border-subtle` | `#e2e7e3` | Pembatas kartu, separator list, border input |
+| `border-emphasis` | `#cbd5ce` | Elemen fokus, pemisah kolom utama |
+| `border-capture` | `#f6d2b5` | Border kartu Quick Capture |
+
+#### Badge & Aksen Semantik
+| Token | Background | Text | Penggunaan |
+|---|---|---|---|
+| `badge-action` | `#e8edf2` | `#1e3a5f` | Item tipe `ACTION` |
+| `badge-waiting` | `#fef3c7` | `#92400e` | Item tipe `WAITING` |
+| `badge-resource` | `#e7f2eb` | `#166534` | Item tipe `RESOURCE` |
+| `badge-critical` | `#fee2e2` | `#b91c1c` | Ambang terlampaui (> 3 hari / > 7 hari) |
+| `button-capture` | `#a35825` | `#ffffff` | Tombol submit Quick Capture |
+
+---
+
+### 6.2 Tipografi
+
+Font utama: **Inter**. Fallback: `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`. Monospace opsional (ID/kode): `JetBrains Mono`.
+
+| Skala | Ukuran | Weight | Penggunaan |
+|---|---|---|---|
+| Display / H1 | `24px` | 700 | Judul halaman, salam header |
+| Heading / H2 | `18px` | 600 | Judul kartu |
+| Subheading / H3 | `14px` | 600 | Judul section list, judul task |
+| Body Regular | `13px` | 400 | Keterangan, deskripsi agenda |
+| Body Medium | `13px` | 500 | Label metadata, tanggal, tombol aksi |
+| Caption | `11px` | 500–600 | Badge GTD, status pill |
+| Metric Large | `28px` | 700 | Angka counter metrik di Dashboard |
+
+---
+
+### 6.3 Spacing & Radius
+
+**Grid:** kelipatan 4px / 8px.
+- `space-xs`: 4px · `space-sm`: 8px · `space-md`: 12–16px · `space-lg`: 20–24px · `space-xl`: 32px
+
+**Border radius:**
+- `radius-sm`: 6px — badge, pill, tombol sekunder
+- `radius-md`: 10px — input, item agenda
+- `radius-lg`: 16px — kartu utama, kalender
+- `radius-xl`: 20–24px — kontainer luar, sidebar
+- `radius-full`: 9999px — avatar, dot indikator
+
+**Shadow:**
+- Surface: `0 2px 8px -2px rgba(27,36,32,0.04), 0 1px 3px 0 rgba(27,36,32,0.02)`
+- Hover: `0 4px 14px -3px rgba(27,36,32,0.08)`
+- Header: `0 1px 3px 0 rgba(0,0,0,0.02)`
+
+---
+
+### 6.4 Layout Desktop
+
+CSS Grid 3 kolom:
+
+```
+[Sidebar 250–280px] [Main content flex-grow] [Schedule panel 360–400px]
+```
+
+Seluruh kontainer sejajar pada batas atas dan bawah kanvas. Tidak ada ragged edges atau ruang kosong.
+
+Kartu-kartu sejajar tingginya (*equal-height containers*) dengan `overflow-y: auto` dan scrollbar tipis bila konten melebihi area pandang.
+
+---
+
+### 6.5 Spesifikasi komponen per layar
+
+#### Dashboard
+
+**Header Bar**
+- Kiri: avatar bundar + nama pengguna + badge verifikasi + teks sambutan
+- Kanan: search global (`⌘K`), ikon notifikasi, tombol `+ Capture` gelap kontras
+
+**Quick Capture Banner** (selalu terlihat di atas konten)
+- Format satu baris horizontal ramping
+- Ikon petir aksen terracotta di kiri
+- Input teks bersih, placeholder: `"Ketik apa saja yang terlintas di kepala lalu tekan Enter untuk simpan ke Inbox..."`
+- Badge keyboard `↵ Enter` kecil di kanan
+- Tombol submit bulat/persegi halus warna `#a35825`
+
+**Total Overview · GTD State** (4 kartu metrik sejajar)
+- Open Items — jumlah dengan ikon filter
+- Waiting — jumlah dengan ikon hourglass
+- Questions Critical — jumlah yang melampaui 7 hari, teks merah `text-danger-critical`
+- Top 5 Streak — jumlah hari berturut-turut, ikon api bila streak aktif
+
+**Weekly GTD Velocity & Completion** (chart batang)
+- Dua seri: Selesai (sage muted) dan Aktif (dark charcoal)
+- Sumbu X: hari dalam minggu (M–S)
+- Toggle: Minggu Ini / pilihan lain
+- Tooltip: label persentase velocity di titik tertinggi
+
+**Top 5: Today's Winning**
+- Header: ikon target, teks `"Top 5: Today's Winning"`, badge `"Terkunci Hari Ini"`, tombol `+ Add`
+- Per item: checkbox bulat · judul · penanda carryover mencolok (`▲ 3 hari terbawa` merah / `Hari ke-1`) · badge durasi (`90m`, `45m`) · tanggal jatuh tempo
+- Tinggi kartu sejajar presisi dengan kartu Sodokan
+
+**Schedule Panel** (kolom kanan)
+- Header: nama bulan + navigasi ← →  + tombol `See All`
+- Date strip horizontal: tampilkan 5 hari, aktif dengan background `#2d3b36` teks putih
+- Search schedule (`⌘1`) + filter pill: `Semua [n]` · `Action [n]` · `Waiting [n]`
+- Item list: jam · badge tipe · judul · tombol Done cepat di kanan untuk ACTION dan WAITING
+- Item dapat di-expand untuk melihat detail (attendees, Question yang menunggu, link platform)
+
+**Sidebar Navigation**
+- Brand: logo + subtitle `GTD • PARA Hub`
+- Quick search (`⌘F`)
+- Grup *Main*: Dashboard · Morning Review (dengan status `✓ Done` atau `Active`) · Inbox/Capture (badge counter) · People & Contacts · Meetings · PARA Archive
+- Grup *Others*: Resources · Settings (badge counter) · Support
+- Footer: card profil mini + status mode (`Deep Focus Mode`)
+
+---
+
+#### Inbox & Clarify Hub
+
+**Header Halaman**
+- Judul `Inbox & Clarify Hub` + badge status antrean (hijau: `Item Menanti`)
+- Subjudul filosofi: *"Kecepatan capture di atas kerapian data. Satu pertanyaan saat clarify: Bola ada di tangan siapa?"*
+- Kanan atas: indikator `Tersinkronisasi · Siap Offline (PWA)`
+
+**Quick Capture** (tetap ada di halaman ini)
+- Sama seperti banner Dashboard, ditambah baris **Sumber Cepat**: `Teks / Ide` · `Suara (Whisper AI)` · `WhatsApp / Chat` · `Meeting Snippet` · `Email Forward`
+
+**Fokus Clarify** (area utama tengah)
+- Label: `Fokus Clarify · Kartu 1 dari N dalam antrean` + indikator FIFO
+- Kartu item aktif: sumber tangkapan · waktu diterima · konten mentah dalam kotak abu
+- **Langkah 1 — Koreografi GTD:** tiga pilihan besar sejajar: `ACTION` · `WAITING` · `RESOURCE`, masing-masing dengan deskripsi singkat. Yang dipilih diberi border tegas / background aksen
+- **Langkah 2 — Struktur PARA:** dropdown Area (wajib) + dropdown Project
+- **Langkah 3 — Konteks Tambahan:** pill sub-tipe · pemilih orang (+ Orang Baru inline) · target selesai · estimasi durasi (pill: 15m · 30m · 45m · 60m+)
+- Tombol bawah: `Tunda ke Nanti (Skip)` (sekunder) + `Simpan & Lanjut Item Berikutnya (N tersisa)` (primer gelap)
+- Antrean berikutnya memudar di bawah kartu aktif, tidak dapat diklik (FIFO)
+
+**Panel Kanan Inbox**
+- **Aturan Clarify 2-Menit**: boks instruksional (butuh > 2m → ACTION, orang lain → WAITING, bahan bacaan → RESOURCE)
+- **Status Antrean Inbox**: pending saat ini · overdue > 24 jam · progres bar Uncategorized (mis. `2 / 10 Maks`)
+- **Master People Sering Terlibat**: daftar orang dengan badge jumlah Waiting dan Tanya, tombol `+ Tambah Kontak Cepat`
+- **Filosofi Eksekutif**: kutipan pengingat di bagian bawah
+
+---
+
+### 6.6 Aturan interaksi
+
+- Item selesai: teks dicoret (`text-decoration: line-through`) + opacity `0.6`, seketika tanpa animasi panjang
+- Hover kartu: shadow meningkat ke level `Interactive Hover Shadow`
+- Satu kartu clarify aktif penuh, kartu berikutnya `opacity: 0.4` — tidak dapat diklik sampai yang aktif diselesaikan atau di-skip
+- State `text-danger-critical` muncul otomatis bila ambang hari terlampaui — tidak perlu aksi pengguna
+
+---
+
+## 7. Non-fungsional
 
 | Aspek | Target |
 |---|---|
@@ -320,5 +501,5 @@ Meskipun seluruh fitur akan dibangun, urutan ini disarankan agar taksonomi teruj
 | Audit Trail dibuang | Tidak bernilai untuk single-user |
 | Recent activity dibuang | Memerlukan Audit Trail yang sudah dimatikan |
 | Backup & Restore → Export saja | Backup adalah urusan infrastruktur database |
-| Top 5 → snapshot harian "Today's winning" | Fungsinya bukti hasil harian, bukan penanda prioritas |
+| Top 5 → snapshot harian "Today's winning" | Fungsinya bukti hasil harian, bukan penanda prioritas (maksimal 5 item) |
 | Ditambahkan: master data People | Diperlukan agar daftar pertanyaan dapat dikelompokkan per orang |

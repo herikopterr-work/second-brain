@@ -1,6 +1,7 @@
 -- ==============================================================================
 -- Migration: 001_initial_schema.sql
 -- Description: Skema database lengkap Second Brain PKM sesuai PRD Bagian 4
+--              Mencakup user_id, RLS, constraint integritas, dan Top 5 snapshot
 -- ==============================================================================
 
 -- 1. EXTENSIONS
@@ -46,6 +47,7 @@ END $$;
 -- 3.1 Tabel: areas
 CREATE TABLE IF NOT EXISTS areas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID DEFAULT auth.uid(),
     name TEXT NOT NULL,
     is_default BOOLEAN NOT NULL DEFAULT false,
     archived_at TIMESTAMPTZ DEFAULT NULL,
@@ -55,6 +57,7 @@ CREATE TABLE IF NOT EXISTS areas (
 -- 3.2 Tabel: projects
 CREATE TABLE IF NOT EXISTS projects (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID DEFAULT auth.uid(),
     area_id UUID NOT NULL REFERENCES areas(id) ON DELETE RESTRICT,
     name TEXT NOT NULL,
     status project_status NOT NULL DEFAULT 'active',
@@ -65,6 +68,7 @@ CREATE TABLE IF NOT EXISTS projects (
 -- 3.3 Tabel: people
 CREATE TABLE IF NOT EXISTS people (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID DEFAULT auth.uid(),
     name TEXT NOT NULL,
     role TEXT DEFAULT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -73,6 +77,7 @@ CREATE TABLE IF NOT EXISTS people (
 -- 3.4 Tabel: meetings
 CREATE TABLE IF NOT EXISTS meetings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID DEFAULT auth.uid(),
     title TEXT NOT NULL,
     meeting_date DATE NOT NULL,
     area_id UUID REFERENCES areas(id) ON DELETE SET NULL,
@@ -88,6 +93,7 @@ CREATE TABLE IF NOT EXISTS meetings (
 CREATE TABLE IF NOT EXISTS meeting_attendees (
     meeting_id UUID NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
     person_id UUID NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+    user_id UUID DEFAULT auth.uid(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (meeting_id, person_id)
 );
@@ -95,6 +101,7 @@ CREATE TABLE IF NOT EXISTS meeting_attendees (
 -- 3.6 Tabel: items
 CREATE TABLE IF NOT EXISTS items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID DEFAULT auth.uid(),
     title TEXT NOT NULL,
     body TEXT DEFAULT NULL,
     type item_type NOT NULL DEFAULT 'inbox',
@@ -110,7 +117,13 @@ CREATE TABLE IF NOT EXISTS items (
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     done_at TIMESTAMPTZ DEFAULT NULL,
-    archived_at TIMESTAMPTZ DEFAULT NULL
+    archived_at TIMESTAMPTZ DEFAULT NULL,
+    -- Constraints PRD & Panduan Implementasi
+    CONSTRAINT must_have_context CHECK (type = 'inbox' OR area_id IS NOT NULL),
+    CONSTRAINT person_required CHECK (
+        ((type = 'waiting' OR subtype = 'question') AND person_id IS NOT NULL)
+        OR (type != 'waiting' AND subtype IS DISTINCT FROM 'question')
+    )
 );
 
 -- 3.7 Tabel: item_relations
@@ -118,19 +131,22 @@ CREATE TABLE IF NOT EXISTS item_relations (
     from_item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
     to_item_id UUID NOT NULL REFERENCES items(id) ON DELETE CASCADE,
     relation_type item_relation_type NOT NULL,
+    user_id UUID DEFAULT auth.uid(),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (from_item_id, to_item_id, relation_type),
     CONSTRAINT check_no_self_relation CHECK (from_item_id <> to_item_id)
 );
 
--- 3.8 Tabel: daily_snapshots
+-- 3.8 Tabel: daily_snapshots (Top 5: Today's Winning)
 CREATE TABLE IF NOT EXISTS daily_snapshots (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID DEFAULT auth.uid(),
     date DATE NOT NULL UNIQUE,
     item_ids UUID[] NOT NULL DEFAULT '{}',
     completed_item_ids UUID[] NOT NULL DEFAULT '{}',
     morning_review_completed_at TIMESTAMPTZ DEFAULT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    CONSTRAINT check_max_top_items CHECK (cardinality(item_ids) <= 5)
 );
 
 -- 4. TRIGGERS & FUNCTIONS
@@ -177,7 +193,7 @@ ALTER TABLE items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE item_relations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_snapshots ENABLE ROW LEVEL SECURITY;
 
--- Policy Single-User: Mengizinkan akses penuh
+-- Policy Single-User: Mengizinkan akses pemilik berdasar user_id
 DO $$ 
 DECLARE
     tbl text;
@@ -185,7 +201,17 @@ DECLARE
 BEGIN
     FOREACH tbl IN ARRAY tables LOOP
         EXECUTE format('DROP POLICY IF EXISTS "Owner full access policy" ON %I;', tbl);
-        EXECUTE format('CREATE POLICY "Owner full access policy" ON %I FOR ALL USING (true) WITH CHECK (true);', tbl);
+        EXECUTE format('DROP POLICY IF EXISTS "owner only" ON %I;', tbl);
+        EXECUTE format('DROP POLICY IF EXISTS "Owner access policy" ON %I;', tbl);
+        
+        EXECUTE format(
+            'CREATE POLICY "Owner access policy" ON %I FOR ALL USING (
+                auth.uid() = user_id OR auth.uid() IS NULL
+            ) WITH CHECK (
+                auth.uid() = user_id OR auth.uid() IS NULL
+            );',
+            tbl
+        );
     END LOOP;
 END $$;
 

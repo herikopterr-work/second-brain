@@ -129,6 +129,16 @@ export default function Header() {
               👤 People
             </Link>
             <Link
+              href="/meetings"
+              className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
+                pathname?.startsWith('/meetings')
+                  ? 'bg-[#162B20] text-white shadow-sm'
+                  : 'text-[#5B6B60] hover:text-[#19241C] hover:bg-white/70'
+              }`}
+            >
+              🗓️ Meetings
+            </Link>
+            <Link
               href="/"
               className={`px-2.5 py-1.5 rounded-xl font-semibold transition-all shrink-0 ${
                 pathname === '/'

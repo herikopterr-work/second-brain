@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Header from '@/components/Header';
+import AppShell from '@/components/layout/AppShell';
 import { savePendingItem, getPendingItems, type PendingItem } from '@/lib/offline/db';
 import { syncPendingItems, notifySyncUpdate, SYNC_EVENT_NAME } from '@/lib/offline/sync';
 
@@ -86,10 +86,8 @@ export default function CapturePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EFF3ED] text-[#19241C] flex flex-col">
-      <Header />
-
-      <main className="flex-1 max-w-xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-start space-y-6">
+    <AppShell maxContentWidth="max-w-xl">
+      <div className="flex flex-col justify-start space-y-6">
         <div className="space-y-1">
           <h1 className="text-xl font-bold tracking-tight text-[#19241C]">Quick Capture</h1>
           <p className="text-xs text-[#5B6B60]">
@@ -155,7 +153,7 @@ export default function CapturePage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

@@ -13,89 +13,80 @@ export default function GTDStateOverview({
   criticalQuestionsCount = 2,
   top5StreakDays = 5,
 }: GTDStateProps) {
+  const formatNum = (n: number) => String(n).padStart(2, '0');
+
   return (
-    <div className="space-y-3">
-      {/* Header Row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-[#58655B]">📊</span>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-[#58655B]">
-            TOTAL OVERVIEW • GTD STATE
+    <section className="bg-surface-elevated rounded-2xl p-unit-md shadow-sm flex flex-col gap-unit-sm shrink-0 border border-border-subtle">
+      <div className="flex items-center justify-between h-6 shrink-0">
+        <div className="flex items-center gap-unit-xs">
+          <span className="material-symbols-outlined text-sage-medium text-base">stacked_bar_chart</span>
+          <span className="text-[10.5px] font-bold text-text-muted uppercase tracking-wider">
+            Total Overview • GTD State
           </span>
         </div>
-
-        <button className="px-2.5 py-1 rounded-lg bg-white border border-[#DFE6DC] text-xs font-semibold text-[#19241C] flex items-center gap-1.5 shadow-2xs hover:bg-[#F6F8F5]">
+        <button
+          className="flex items-center gap-unit-2xs px-unit-sm py-0.5 bg-surface-container-low hover:bg-surface-container rounded-lg text-[12px] font-semibold text-text-secondary transition-all"
+          type="button"
+        >
           <span>Hari Ini</span>
-          <span className="text-[10px] text-[#8A978E]">⌄</span>
+          <span className="material-symbols-outlined text-sm">keyboard_arrow_down</span>
         </button>
       </div>
 
-      {/* 4 Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        {/* 1. Open Actions */}
-        <div className="bg-white border border-[#DFE6DC] rounded-2xl p-4 shadow-sm flex items-center gap-3.5 hover:border-[#CBD5C8] transition-all">
-          <div className="w-11 h-11 rounded-xl bg-[#EBF4EE] text-[#2A5C43] flex items-center justify-center text-lg shrink-0">
-            📑
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-unit-sm">
+        {/* Stat 1: Open Actions */}
+        <div className="bg-surface-container-low hover:bg-surface-container-high/60 transition-all rounded-xl p-unit-md flex items-center gap-unit-md shadow-sm border border-border-subtle/50">
+          <div className="w-9 h-9 rounded-xl bg-type-action-bg text-type-action flex items-center justify-center shrink-0 shadow-2xs">
+            <span className="material-symbols-outlined text-lg">tune</span>
           </div>
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A978E]">
-              OPEN ACTIONS
-            </div>
-            <div className="text-xl font-extrabold text-[#19241C] font-mono tracking-tight">
-              {String(actionCount).padStart(2, '0')}{' '}
-              <span className="text-xs font-semibold font-sans text-[#58655B]">Items</span>
-            </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Open Actions</span>
+            <span className="text-[18px] font-bold text-forest-dark tracking-tight leading-tight">
+              {formatNum(actionCount)} Items
+            </span>
           </div>
         </div>
 
-        {/* 2. Waiting Others */}
-        <div className="bg-white border border-[#DFE6DC] rounded-2xl p-4 shadow-sm flex items-center gap-3.5 hover:border-[#CBD5C8] transition-all">
-          <div className="w-11 h-11 rounded-xl bg-[#FEF3C7] text-[#B45309] flex items-center justify-center text-lg shrink-0">
-            ⏳
+        {/* Stat 2: Waiting Others */}
+        <div className="bg-surface-container-low hover:bg-surface-container-high/60 transition-all rounded-xl p-unit-md flex items-center gap-unit-md shadow-sm border border-border-subtle/50">
+          <div className="w-9 h-9 rounded-xl bg-type-waiting-bg text-type-waiting flex items-center justify-center shrink-0 shadow-2xs">
+            <span className="material-symbols-outlined text-lg">hourglass_top</span>
           </div>
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A978E]">
-              WAITING OTHERS
-            </div>
-            <div className="text-xl font-extrabold text-[#19241C] font-mono tracking-tight">
-              {String(waitingCount).padStart(2, '0')}{' '}
-              <span className="text-xs font-semibold font-sans text-[#58655B]">Items</span>
-            </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Waiting Others</span>
+            <span className="text-[18px] font-bold text-forest-dark tracking-tight leading-tight">
+              {formatNum(waitingCount)} Items
+            </span>
           </div>
         </div>
 
-        {/* 3. Questions > 7D */}
-        <div className="bg-white border border-[#DFE6DC] rounded-2xl p-4 shadow-sm flex items-center gap-3.5 hover:border-[#CBD5C8] transition-all">
-          <div className="w-11 h-11 rounded-xl bg-[#FEE2E2] text-[#DC2626] flex items-center justify-center text-lg shrink-0">
-            ⚠️
+        {/* Stat 3: Questions > 7D */}
+        <div className="bg-surface-container-low hover:bg-status-critical-bg/30 transition-all rounded-xl p-unit-md flex items-center gap-unit-md shadow-sm border border-border-subtle/50">
+          <div className="w-9 h-9 rounded-xl bg-status-critical-bg text-status-critical flex items-center justify-center shrink-0 shadow-2xs">
+            <span className="material-symbols-outlined text-lg">warning</span>
           </div>
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#DC2626]">
-              QUESTIONS &gt; 7D
-            </div>
-            <div className="text-xl font-extrabold text-[#DC2626] font-mono tracking-tight">
-              {String(criticalQuestionsCount).padStart(2, '0')}{' '}
-              <span className="text-xs font-bold font-sans">Kritis</span>
-            </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-bold text-status-critical uppercase tracking-wider">Questions &gt; 7D</span>
+            <span className="text-[18px] font-bold text-status-critical tracking-tight leading-tight">
+              {formatNum(criticalQuestionsCount)} Kritis
+            </span>
           </div>
         </div>
 
-        {/* 4. Top 5 Streak */}
-        <div className="bg-white border border-[#DFE6DC] rounded-2xl p-4 shadow-sm flex items-center gap-3.5 hover:border-[#CBD5C8] transition-all">
-          <div className="w-11 h-11 rounded-xl bg-[#EBF4EE] text-[#2A5C43] flex items-center justify-center text-lg shrink-0">
-            🛡️
+        {/* Stat 4: Top 5 Streak */}
+        <div className="bg-surface-container-low hover:bg-surface-container-high/60 transition-all rounded-xl p-unit-md flex items-center gap-unit-md shadow-sm border border-border-subtle/50">
+          <div className="w-9 h-9 rounded-xl bg-secondary-container text-on-secondary-fixed flex items-center justify-center shrink-0 shadow-2xs">
+            <span className="material-symbols-outlined text-lg">verified</span>
           </div>
-          <div className="flex-1">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-[#8A978E]">
-              TOP 5 STREAK
-            </div>
-            <div className="text-xl font-extrabold text-[#19241C] font-mono tracking-tight flex items-center justify-between">
-              <span>{top5StreakDays}d <span className="text-xs font-semibold font-sans text-[#2A5C43]">Sukses</span></span>
-              <span className="text-base">🔥</span>
-            </div>
+          <div className="flex flex-col min-w-0">
+            <span className="text-[10px] font-bold text-text-muted uppercase tracking-wider">Top 5 Streak</span>
+            <span className="text-[18px] font-bold text-forest-dark tracking-tight leading-tight flex items-center gap-1">
+              <span>{top5StreakDays}d Sukses</span>
+              <span className="text-sm">🔥</span>
+            </span>
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

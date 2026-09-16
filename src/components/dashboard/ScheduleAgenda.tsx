@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { markWaitingItemDone } from '@/lib/dashboard/actions';
 
 export interface MeetingItem {
   id: string;
@@ -12,33 +14,22 @@ export interface MeetingItem {
   questions: { id: string; personName: string; text: string; tag: string }[];
 }
 
-const WEEK_DAYS = [
-  { dayName: 'Sat', dayNum: '02' },
-  { dayName: 'Sun', dayNum: '03' },
-  { dayName: 'Mon', dayNum: '04', isToday: true },
-  { dayName: 'Tue', dayNum: '05' },
-  { dayName: 'Wed', dayNum: '06' },
-];
-
 interface ScheduleAgendaProps {
   initialMeetings?: MeetingItem[];
 }
 
-export default function ScheduleAgenda({ initialMeetings }: ScheduleAgendaProps) {
-  const [selectedDay, setSelectedDay] = useState('04');
-  const [activeTab, setActiveTab] = useState<'all' | 'action' | 'waiting'>('all');
-  const [meetingsDone, setMeetingsDone] = useState<Record<string, boolean>>({});
-
-  const meetings = initialMeetings && initialMeetings.length > 0 ? initialMeetings : [
+export default function ScheduleAgenda({ initialMeetings = [] }: ScheduleAgendaProps) {
+  // Default mock meetings matching Stitch
+  const defaultMeetings: MeetingItem[] = [
     {
       id: 'm-1',
       title: 'Weekly Sync Team Lead',
-      time: '10:00 - 10:45 WIB',
-      type: 'WAITING' as const,
+      time: '10:00 – 10:45 WIB',
+      type: 'WAITING',
       attendees: [
-        { id: '1', name: 'Agus C.', monogram: 'AC', color: '#2A5C43' },
-        { id: '2', name: 'Rina I.', monogram: 'RI', color: '#B45309' },
-        { id: '3', name: 'Budi S.', monogram: 'BS', color: '#2E5C6E' },
+        { id: '1', name: 'Agus', monogram: 'AG', color: 'bg-sage-light text-forest-dark' },
+        { id: '2', name: 'Rina', monogram: 'RI', color: 'bg-secondary-container text-forest-dark' },
+        { id: '3', name: 'Budi Santoso', monogram: 'BS', color: 'bg-type-action-bg text-type-action' },
       ],
       additionalMembersCount: 2,
       questions: [
@@ -49,8 +40,8 @@ export default function ScheduleAgenda({ initialMeetings }: ScheduleAgendaProps)
     {
       id: 'm-2',
       title: 'Workflow Inbox Capture Mobile',
-      time: '14:30 - 16:00 WIB',
-      type: 'RESOURCE' as const,
+      time: '14:30 – 16:00 WIB',
+      type: 'RESOURCE',
       attendees: [],
       additionalMembersCount: 0,
       questions: [],
@@ -58,224 +49,371 @@ export default function ScheduleAgenda({ initialMeetings }: ScheduleAgendaProps)
     {
       id: 'm-3',
       title: 'End of Day Review & Sync',
-      time: '17:00 - 17:45 WIB',
-      type: 'ACTION' as const,
+      time: '17:00 – 17:45 WIB',
+      type: 'ACTION',
       attendees: [],
       additionalMembersCount: 0,
       questions: [],
     },
   ];
 
-  const toggleDone = (id: string) => {
-    setMeetingsDone((prev) => ({ ...prev, [id]: !prev[id] }));
+  const [meetings] = useState<MeetingItem[]>(
+    initialMeetings.length > 0 ? initialMeetings : defaultMeetings
+  );
+
+  const [selectedDay, setSelectedDay] = useState('04');
+  const [activeTab, setActiveTab] = useState<'all' | 'action' | 'waiting' | 'meeting'>('all');
+  const [expandedId, setExpandedId] = useState<string | null>('m-1');
+  const [answeredMap, setAnsweredMap] = useState<Record<string, boolean>>({});
+  const [allAnswered, setAllAnswered] = useState(false);
+
+  const handleMarkAnswered = async (questionId: string) => {
+    setAnsweredMap((prev) => ({ ...prev, [questionId]: true }));
+    try {
+      await markWaitingItemDone(questionId);
+    } catch (err) {
+      console.error('Gagal mark answered:', err);
+    }
+  };
+
+  const handleMarkAllAnswered = () => {
+    setAllAnswered(true);
   };
 
   const filteredMeetings = meetings.filter((m) => {
     if (activeTab === 'all') return true;
     if (activeTab === 'action' && m.type === 'ACTION') return true;
     if (activeTab === 'waiting' && m.type === 'WAITING') return true;
+    if (activeTab === 'meeting') return m.attendees.length > 0 || m.title.toLowerCase().includes('sync');
     return false;
   });
 
-  return (
-    <div className="bg-white border border-[#DFE6DC] rounded-3xl p-6 shadow-sm space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-[#19241C]">📅</span>
-          <h3 className="font-bold text-xs uppercase tracking-wider text-[#19241C]">
-            Schedule
-          </h3>
-        </div>
+  const waitingCount = meetings.filter((m) => m.type === 'WAITING').length;
+  const actionCount = meetings.filter((m) => m.type === 'ACTION').length;
+  const meetingCount = meetings.filter((m) => m.attendees.length > 0 || m.title.toLowerCase().includes('sync')).length;
 
-        <button className="text-xs font-semibold text-[#58655B] hover:text-[#19241C] transition-colors">
+  return (
+    <div className="bg-surface-elevated rounded-2xl p-unit-lg shadow-sm flex flex-col gap-unit-sm flex-1 border border-border-subtle h-full">
+      {/* Header */}
+      <div className="flex items-center justify-between h-7 shrink-0">
+        <div className="flex items-center gap-unit-xs">
+          <span className="material-symbols-outlined text-sage-medium text-base">calendar_month</span>
+          <span className="text-[14px] text-forest-dark font-semibold">Schedule</span>
+        </div>
+        <Link
+          href="/meetings"
+          className="text-[12px] font-semibold text-text-muted hover:text-text-primary transition-colors"
+        >
           See All
-        </button>
+        </Link>
       </div>
 
-      {/* Weekly Date Selector Strip */}
-      <div className="bg-[#F6F8F5] border border-[#DFE6DC] rounded-2xl p-2 space-y-2">
-        <div className="flex items-center justify-between text-xs font-bold text-[#19241C] px-2">
-          <button className="text-[#8A978E] hover:text-[#19241C]">‹</button>
-          <span>August 2025</span>
-          <button className="text-[#8A978E] hover:text-[#19241C]">›</button>
+      {/* Mini Calendar Strip */}
+      <div className="flex flex-col gap-1 bg-surface-container-low p-unit-sm rounded-xl border border-border-subtle/50">
+        <div className="flex items-center justify-between px-unit-xs">
+          <button
+            aria-label="Previous month"
+            className="text-text-muted hover:text-text-primary transition-colors p-0.5"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-sm">chevron_left</span>
+          </button>
+          <span className="text-[12.5px] text-forest-dark font-semibold">August 2025</span>
+          <button
+            aria-label="Next month"
+            className="text-text-muted hover:text-text-primary transition-colors p-0.5"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-sm">chevron_right</span>
+          </button>
         </div>
 
-        <div className="grid grid-cols-5 gap-1 text-center">
-          {WEEK_DAYS.map((w) => {
-            const isSelected = selectedDay === w.dayNum;
+        <div className="grid grid-cols-5 gap-unit-xs pt-1">
+          {[
+            { day: 'Sat', num: '02' },
+            { day: 'Sun', num: '03' },
+            { day: 'Mon', num: '04' },
+            { day: 'Tue', num: '05' },
+            { day: 'Wed', num: '06' },
+          ].map((item) => {
+            const isSelected = selectedDay === item.num;
             return (
               <button
-                key={w.dayNum}
-                onClick={() => setSelectedDay(w.dayNum)}
-                className={`py-2 px-1 rounded-xl transition-all flex flex-col items-center gap-0.5 ${
+                key={item.num}
+                type="button"
+                onClick={() => setSelectedDay(item.num)}
+                className={`flex flex-col items-center py-1 rounded-lg transition-all ${
                   isSelected
-                    ? 'bg-[#1E3B2B] text-white shadow-sm font-bold'
-                    : 'text-[#58655B] hover:bg-white/80'
+                    ? 'bg-forest-dark text-on-primary shadow-xs'
+                    : 'hover:bg-surface-container text-text-muted'
                 }`}
               >
-                <span className="text-[10px] font-medium opacity-80">{w.dayName}</span>
-                <span className="text-xs font-mono font-bold">{w.dayNum}</span>
+                <span className={`text-[11px] ${isSelected ? 'opacity-80' : 'text-text-muted'}`}>
+                  {item.day}
+                </span>
+                <span
+                  className={`text-[13px] leading-tight ${
+                    isSelected ? 'font-bold' : 'text-text-primary font-semibold'
+                  }`}
+                >
+                  {item.num}
+                </span>
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Search Bar & Filters */}
-      <div className="space-y-2.5">
-        <div className="relative">
-          <span className="absolute left-3 top-2 text-xs text-[#8A978E]">🔍</span>
-          <input
-            type="text"
-            placeholder="Search schedule..."
-            className="w-full pl-8 pr-12 py-1.5 bg-[#F6F8F5] border border-[#DFE6DC] rounded-xl text-xs text-[#19241C] placeholder-[#8A978E] focus:outline-none"
-          />
-          <span className="absolute right-2.5 top-1.5 px-1.5 py-0.5 rounded bg-white border border-[#DFE6DC] text-[9px] font-mono text-[#8A978E]">
-            ⌘I
+      {/* Schedule Search Field */}
+      <div className="relative flex items-center">
+        <span className="material-symbols-outlined absolute left-unit-md text-text-muted text-base pointer-events-none">
+          search
+        </span>
+        <input
+          className="w-full bg-surface-container-low pl-9 pr-14 py-unit-xs rounded-xl text-[12px] text-text-primary placeholder:text-text-muted focus:outline-none focus:bg-surface-elevated transition-all border border-border-subtle/40"
+          placeholder="Search schedule..."
+          type="text"
+        />
+        <div className="absolute right-unit-sm flex items-center gap-1">
+          <span className="text-[10px] font-semibold text-text-muted bg-surface-container px-unit-2xs py-0.5 rounded">
+            ⌘1
           </span>
-        </div>
-
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1.5 text-xs">
-          <button
-            onClick={() => setActiveTab('all')}
-            className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 text-[11px] ${
-              activeTab === 'all'
-                ? 'bg-[#1E3B2B] text-white'
-                : 'bg-[#F6F8F5] text-[#58655B] hover:text-[#19241C]'
-            }`}
-          >
-            <span>📑</span>
-            <span>Semua {meetings.length}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('action')}
-            className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 text-[11px] ${
-              activeTab === 'action'
-                ? 'bg-[#EBF4EE] text-[#2A5C43] border border-[#CBD5C8]'
-                : 'bg-[#F6F8F5] text-[#58655B] hover:text-[#19241C]'
-            }`}
-          >
-            <span>✓</span>
-            <span>Action {meetings.filter((m) => m.type === 'ACTION').length}</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('waiting')}
-            className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1 text-[11px] ${
-              activeTab === 'waiting'
-                ? 'bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]'
-                : 'bg-[#F6F8F5] text-[#58655B] hover:text-[#19241C]'
-            }`}
-          >
-            <span>⏳</span>
-            <span>Waiting {meetings.filter((m) => m.type === 'WAITING').length}</span>
-          </button>
+          <span className="material-symbols-outlined text-text-muted text-base">tune</span>
         </div>
       </div>
 
-      {/* Meeting Cards List */}
-      <div className="space-y-3">
-        {filteredMeetings.map((m) => {
-          const isDone = meetingsDone[m.id];
-          const isWaiting = m.type === 'WAITING';
+      {/* Filter Segmented Tabs */}
+      <div className="flex items-center gap-1 pb-unit-xs overflow-x-auto scrollbar-none">
+        <button
+          type="button"
+          onClick={() => setActiveTab('all')}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold transition-all shrink-0 ${
+            activeTab === 'all'
+              ? 'bg-surface-container text-forest-dark shadow-xs'
+              : 'text-text-secondary hover:bg-surface-container-low'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[13px]">list_alt</span>
+          <span>Semua</span>
+          <span className="text-[10.5px] opacity-70">3</span>
+        </button>
 
-          return (
-            <div
-              key={m.id}
-              className="p-4 rounded-2xl bg-[#F6F8F5] border border-[#DFE6DC] space-y-3 shadow-2xs transition-all"
-            >
-              {/* Top row */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-mono text-[#58655B] font-semibold">
-                    {m.time}
-                  </span>
-                  <span
-                    className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                      m.type === 'WAITING'
-                        ? 'bg-[#FEF3C7] text-[#B45309] border border-[#FDE68A]'
-                        : m.type === 'ACTION'
-                        ? 'bg-[#EBF4EE] text-[#2A5C43] border border-[#D1E7DD]'
-                        : 'bg-[#E0F2FE] text-[#2E5C6E] border border-[#BAE6FD]'
-                    }`}
-                  >
-                    {m.type}
-                  </span>
+        <button
+          type="button"
+          onClick={() => setActiveTab('action')}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold transition-all shrink-0 ${
+            activeTab === 'action'
+              ? 'bg-surface-container text-forest-dark shadow-xs'
+              : 'text-text-secondary hover:bg-surface-container-low'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[13px] text-type-action">check_circle</span>
+          <span>Action</span>
+          <span className="text-[10.5px] opacity-70">{actionCount}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('waiting')}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold transition-all shrink-0 ${
+            activeTab === 'waiting'
+              ? 'bg-surface-container text-forest-dark shadow-xs'
+              : 'text-text-secondary hover:bg-surface-container-low'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[13px] text-type-waiting">hourglass_empty</span>
+          <span>Waiting</span>
+          <span className="text-[10.5px] opacity-70">{waitingCount}</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('meeting')}
+          className={`flex items-center gap-1 px-2.5 py-1 rounded-full text-[12px] font-semibold transition-all shrink-0 ${
+            activeTab === 'meeting'
+              ? 'bg-surface-container text-forest-dark shadow-xs'
+              : 'text-text-secondary hover:bg-surface-container-low'
+          }`}
+        >
+          <span className="material-symbols-outlined text-[13px] text-sage-deep">videocam</span>
+          <span>Meeting</span>
+          <span className="text-[10.5px] opacity-70">{meetingCount}</span>
+        </button>
+      </div>
+
+      {/* Agenda Meeting Cards Stack */}
+      <div className="flex-1 min-h-0 flex flex-col gap-unit-xs overflow-y-auto pr-1">
+        {filteredMeetings.map((item) => {
+          const isExpanded = expandedId === item.id;
+
+          if (isExpanded) {
+            return (
+              <div
+                key={item.id}
+                className="bg-surface-container-low rounded-xl p-unit-md flex flex-col gap-unit-sm shadow-sm border border-border-subtle/50 transition-all"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <div className="flex items-center gap-unit-xs">
+                      <span className="text-[11.5px] text-text-muted font-medium">{item.time}</span>
+                      <span className="text-[9.5px] font-bold bg-type-waiting-bg text-type-waiting px-1.5 py-0.5 rounded-full flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[10.5px] leading-none">hourglass_top</span>
+                        <span>{item.type}</span>
+                      </span>
+                    </div>
+                    <span className="text-[14px] text-forest-dark font-semibold leading-snug">
+                      {item.title}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => handleMarkAllAnswered()}
+                      className="w-5 h-5 rounded-lg bg-surface-elevated text-type-action hover:bg-type-action-bg flex items-center justify-center transition-colors shadow-2xs border border-border-subtle/40"
+                      title="Tandai Selesai"
+                    >
+                      <span className="material-symbols-outlined text-xs font-bold">check</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setExpandedId(null)}
+                      className="w-5 h-5 rounded-lg text-text-muted hover:text-text-primary flex items-center justify-center transition-colors"
+                      title="Collapse"
+                    >
+                      <span className="material-symbols-outlined text-sm">expand_less</span>
+                    </button>
+                  </div>
                 </div>
-                <span className="text-xs text-[#8A978E]">⌃</span>
-              </div>
 
-              <h4 className="font-bold text-sm text-[#19241C]">{m.title}</h4>
-
-              {/* Attendees & Video Link */}
-              {m.attendees && m.attendees.length > 0 && (
-                <div className="flex items-center justify-between gap-2 pt-1">
-                  <div className="flex items-center gap-1 text-[11px] text-[#58655B]">
-                    <div className="flex -space-x-1.5">
-                      {m.attendees.map((att) => (
+                {/* Attendees & Google Meet */}
+                <div className="flex items-center justify-between flex-wrap gap-unit-xs">
+                  <div className="flex items-center gap-1">
+                    <div className="flex -space-x-1.5 overflow-hidden">
+                      {item.attendees.map((att) => (
                         <span
                           key={att.id}
-                          style={{ backgroundColor: att.color }}
-                          className="w-5 h-5 rounded-full text-white text-[9px] font-bold flex items-center justify-center border border-white"
+                          className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-[9px] font-bold ring-2 ring-surface-elevated ${att.color}`}
                         >
                           {att.monogram}
                         </span>
                       ))}
                     </div>
-                    {m.additionalMembersCount > 0 && (
-                      <span className="text-[10px] text-[#8A978E] ml-1">
-                        +{m.additionalMembersCount} members
+                    {item.additionalMembersCount > 0 && (
+                      <span className="text-[11px] text-text-muted ml-1">
+                        +{item.additionalMembersCount} members
                       </span>
                     )}
                   </div>
 
-                  <button className="px-2.5 py-1 rounded-lg bg-white border border-[#DFE6DC] text-[10px] font-bold text-[#19241C] flex items-center gap-1 hover:bg-[#F6F8F5]">
-                    <span>📹</span>
+                  <a
+                    href="https://meet.google.com"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="bg-surface-elevated hover:bg-white text-forest-dark text-[11px] font-semibold px-2 py-0.5 rounded-lg shadow-xs flex items-center gap-1 transition-all border border-border-subtle/60"
+                  >
+                    <span className="material-symbols-outlined text-xs text-sage-deep leading-none">videocam</span>
                     <span>Google Meet</span>
-                  </button>
+                  </a>
                 </div>
-              )}
 
-              {/* Sub-Card: Questions & Follow-ups */}
-              {isWaiting && m.questions && m.questions.length > 0 && (
-                <div className="p-3 bg-white border border-[#DFE6DC] rounded-xl space-y-2.5">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-[#19241C]">Pertanyaan &amp; Follow-up (PRD 5.4):</span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#B45309] text-[10px] font-bold">
-                      {m.questions.length} Waiting
-                    </span>
+                {/* Follow-up Questions Box */}
+                {item.questions.length > 0 && (
+                  <div className="bg-surface-elevated rounded-xl p-unit-md flex flex-col gap-unit-xs shadow-xs border border-border-subtle/50">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[12.5px] text-forest-dark font-medium">
+                        Pertanyaan &amp; Follow-up (PRD 5.4):
+                      </span>
+                      <span className="text-[10.5px] font-semibold bg-type-waiting-bg text-type-waiting px-unit-xs py-0.5 rounded">
+                        {allAnswered ? '0 Waiting' : `${item.questions.length} Waiting`}
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-unit-xs mt-1">
+                      {item.questions.map((q) => {
+                        const isDone = allAnswered || answeredMap[q.id];
+                        return (
+                          <div
+                            key={q.id}
+                            onClick={() => handleMarkAnswered(q.id)}
+                            className={`flex items-center justify-between text-[12px] cursor-pointer hover:bg-surface-container-low p-1 rounded transition-colors ${
+                              isDone ? 'line-through opacity-40' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                                  q.tag === 'Blocker' ? 'bg-status-critical' : 'bg-type-waiting'
+                                }`}
+                              />
+                              <span className="text-text-primary truncate">
+                                {q.personName}: {q.text}
+                              </span>
+                            </div>
+
+                            <span
+                              className={`text-[10px] font-semibold px-unit-xs py-0.5 rounded shrink-0 ${
+                                q.tag === 'Blocker'
+                                  ? 'bg-status-critical-bg text-status-critical'
+                                  : 'bg-type-waiting-bg text-type-waiting'
+                              }`}
+                            >
+                              {q.tag}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Complete CTA Button */}
+                    <button
+                      type="button"
+                      onClick={() => handleMarkAllAnswered()}
+                      className="mt-unit-sm w-full py-unit-xs bg-surface-container-low hover:bg-surface-container text-[12.5px] font-semibold text-forest-dark rounded-xl flex items-center justify-center gap-1 transition-all border border-border-subtle/40"
+                    >
+                      <span className="material-symbols-outlined text-sm">check</span>
+                      <span>{allAnswered ? 'Semua Ditandai Selesai' : 'Tandai Selesai / Terjawab'}</span>
+                    </button>
                   </div>
+                )}
+              </div>
+            );
+          }
 
-                  <div className="space-y-1.5 text-xs text-[#19241C]">
-                    {m.questions.map((q) => (
-                      <div key={q.id} className="flex items-center justify-between text-[11px]">
-                        <span className="truncate pr-2">• {q.personName}: {q.text}</span>
-                        <span
-                          className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                            q.tag === 'Blocker'
-                              ? 'bg-[#FEE2E2] text-[#DC2626]'
-                              : 'bg-[#FEF3C7] text-[#B45309]'
-                          }`}
-                        >
-                          {q.tag}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => toggleDone(m.id)}
-                    className={`w-full py-1.5 rounded-lg text-xs font-semibold transition-all border ${
-                      isDone
-                        ? 'bg-[#EBF4EE] text-[#2A5C43] border-[#CBD5C8]'
-                        : 'bg-[#F6F8F5] hover:bg-[#EFF3ED] text-[#19241C] border-[#DFE6DC]'
+          // Collapsed state
+          return (
+            <div
+              key={item.id}
+              onClick={() => setExpandedId(item.id)}
+              className="bg-surface-container-low rounded-xl px-unit-md py-1.5 flex items-center justify-between shadow-xs hover:bg-surface-container transition-all cursor-pointer border border-border-subtle/40"
+            >
+              <div className="flex flex-col gap-0.5 min-w-0">
+                <div className="flex items-center gap-unit-xs">
+                  <span className="text-[11.5px] text-text-muted">{item.time}</span>
+                  <span
+                    className={`text-[9.5px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-1 ${
+                      item.type === 'RESOURCE'
+                        ? 'bg-type-resource-bg text-type-resource'
+                        : item.type === 'ACTION'
+                        ? 'bg-type-action-bg text-type-action'
+                        : 'bg-type-waiting-bg text-type-waiting'
                     }`}
                   >
-                    {isDone ? '✓ Ditandai Selesai' : '✓ Tandai Selesai / Terjawab'}
-                  </button>
+                    <span className="material-symbols-outlined text-[10.5px] leading-none">
+                      {item.type === 'RESOURCE'
+                        ? 'folder_open'
+                        : item.type === 'ACTION'
+                        ? 'check_circle'
+                        : 'hourglass_top'}
+                    </span>
+                    <span>{item.type}</span>
+                  </span>
                 </div>
-              )}
+                <span className="text-[13px] text-forest-dark font-medium truncate">
+                  {item.title}
+                </span>
+              </div>
+              <span className="material-symbols-outlined text-text-muted text-sm">expand_more</span>
             </div>
           );
         })}

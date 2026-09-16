@@ -43,8 +43,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Jangan cache auth API callbacks atau telemetry
-  if (url.pathname.startsWith('/auth/')) {
+  // Jangan cache internal Next.js assets, HMR, Turbopack, atau auth API
+  if (
+    url.pathname.startsWith('/_next/') ||
+    url.pathname.startsWith('/__turbopack') ||
+    url.pathname.startsWith('/__next') ||
+    url.pathname.startsWith('/api/') ||
+    url.pathname.startsWith('/auth/')
+  ) {
     return;
   }
 

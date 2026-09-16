@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Header from '@/components/Header';
+import AppShell from '@/components/layout/AppShell';
 import PersonSelect from '@/components/PersonSelect';
 import {
   getInboxData,
@@ -221,10 +221,8 @@ export default function InboxPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EFF3ED] text-[#19241C] flex flex-col">
-      <Header />
-
-      <main className="flex-1 max-w-xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-start space-y-6">
+    <AppShell maxContentWidth="max-w-2xl">
+      <div className="flex flex-col justify-start space-y-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
           <div>
@@ -623,7 +621,7 @@ export default function InboxPage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

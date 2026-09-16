@@ -1,43 +1,116 @@
 @import "tailwindcss";
 
+@theme {
+  --color-surface: #f6fbf1;
+  --color-surface-dim: #d6dcd2;
+  --color-surface-bright: #f6fbf1;
+  --color-surface-card: #FFFFFF;
+  --color-surface-elevated: #FFFFFF;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f0f5eb;
+  --color-surface-container: #eaf0e6;
+  --color-surface-container-high: #e4eae0;
+  --color-surface-container-highest: #dfe4da;
+  --color-surface-variant: #dfe4da;
+  --color-surface-tint: #F6F8F5;
+  --color-canvas-base: #EFF3ED;
+
+  --color-primary: #072517;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1e3b2b;
+  --color-on-primary-container: #85a590;
+  --color-primary-fixed: #c9ebd3;
+  --color-primary-fixed-dim: #adceb8;
+  --color-on-primary-fixed: #032112;
+  --color-on-primary-fixed-variant: #304d3c;
+
+  --color-secondary: #4a6549;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #ccebc7;
+  --color-on-secondary-container: #506b4f;
+  --color-secondary-fixed: #ccebc7;
+  --color-secondary-fixed-dim: #b0cfad;
+  --color-on-secondary-fixed: #07200b;
+  --color-on-secondary-fixed-variant: #334d33;
+
+  --color-forest-dark: #162B20;
+  --color-sage-deep: #2E4F3E;
+  --color-sage-medium: #5B7A66;
+  --color-sage-soft: #8BA888;
+  --color-sage-muted: #C2D4C1;
+  --color-sage-light: #E2EBE0;
+
+  --color-text-primary: #19241C;
+  --color-text-secondary: #58655B;
+  --color-text-muted: #8A978E;
+
+  --color-border-subtle: #DFE6DC;
+  --color-border-strong: #CBD5C8;
+  --color-outline: #727973;
+  --color-outline-variant: #c2c8c1;
+
+  --color-type-action: #2A5C43;
+  --color-type-action-bg: #EBF4EE;
+  --color-type-waiting: #B45309;
+  --color-type-waiting-bg: #FEF3C7;
+  --color-type-resource: #2E5C6E;
+  --color-type-resource-bg: #E0F2FE;
+
+  --color-status-critical: #DC2626;
+  --color-status-critical-bg: #FEE2E2;
+
+  --color-capture-banner: #FDF6EA;
+  --color-capture-border: #EADBCE;
+  --color-capture-text: #6C593C;
+  --color-capture-accent: #C27803;
+
+  --color-tertiary: #351800;
+  --color-tertiary-fixed: #ffdcc3;
+  --color-tertiary-fixed-dim: #ffb77d;
+  --color-tertiary-container: #542a00;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ea841a;
+  --color-on-tertiary-fixed: #2f1500;
+  --color-on-tertiary-fixed-variant: #6e3900;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  --spacing-unit-2xs: 0.125rem;
+  --spacing-unit-xs: 0.25rem;
+  --spacing-unit-sm: 0.5rem;
+  --spacing-unit-md: 0.75rem;
+  --spacing-unit-lg: 1rem;
+  --spacing-unit-xl: 1.25rem;
+  --spacing-unit-2xl: 1.5rem;
+  --spacing-unit-3xl: 2rem;
+}
+
 @layer base {
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
-  :root {
-    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    --canvas-base: #EFF3ED;
-    --surface-card: #FFFFFF;
-    --surface-tint: #F6F8F5;
-    --border-subtle: #DFE6DC;
-    --border-strong: #CBD5C8;
-    --forest-dark: #162B20;
-    --forest-primary: #1E3B2B;
-    --sage-deep: #2E4F3E;
-    --sage-medium: #5B7A66;
-    --sage-soft: #8BA888;
-    --sage-light: #E2EBE0;
-    --text-primary: #19241C;
-    --text-secondary: #58655B;
-    --text-muted: #8A978E;
-    --type-action: #2A5C43;
-    --type-action-bg: #EBF4EE;
-    --type-waiting: #B45309;
-    --type-waiting-bg: #FEF3C7;
-    --type-resource: #2E5C6E;
-    --type-resource-bg: #E0F2FE;
-    --status-critical: #DC2626;
-    --status-critical-bg: #FEE2E2;
-    --capture-banner: #FDF6EA;
-    --capture-border: #EADBCE;
-    --capture-text: #6C593C;
-    --capture-accent: #C27803;
-  }
-
   body {
-    font-family: var(--font-sans);
-    background-color: var(--canvas-base);
-    color: var(--text-primary);
+    font-family: var(--font-sans, 'Plus Jakarta Sans', system-ui, sans-serif);
+    background-color: var(--color-canvas-base, #EFF3ED);
+    color: var(--color-text-primary, #19241C);
   }
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
 /* Custom Scrollbar for Executive feel */
@@ -55,3 +128,4 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #8BA888;
 }
+

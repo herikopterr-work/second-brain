@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Header from '@/components/Header';
+import AppShell from '@/components/layout/AppShell';
 import {
   getPeople,
   createPerson,
@@ -102,10 +102,8 @@ export default function PeoplePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#EFF3ED] text-[#19241C] flex flex-col">
-      <Header />
-
-      <main className="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 space-y-6">
+    <AppShell maxContentWidth="max-w-4xl">
+      <div className="space-y-6">
         {/* Header Title */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#DFE6DC]">
           <div>
@@ -364,7 +362,7 @@ export default function PeoplePage() {
             </div>
           </div>
         )}
-      </main>
-    </div>
+      </div>
+    </AppShell>
   );
 }

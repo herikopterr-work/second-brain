@@ -6,7 +6,7 @@ import { syncPendingItems, notifySyncUpdate } from '@/lib/offline/sync';
 
 export default function OmniCaptureBar() {
   const [text, setText] = useState('');
-  const [toast, setToast] = useState(false);
+  const [feedbackPlaceholder, setFeedbackPlaceholder] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -30,12 +30,13 @@ export default function OmniCaptureBar() {
 
     try {
       await savePendingItem(newItem);
+      const savedText = trimmed;
       setText('');
-      setToast(true);
+      setFeedbackPlaceholder(`Tersimpan ke Inbox: "${savedText.slice(0, 24)}..."`);
       notifySyncUpdate();
 
       setTimeout(() => {
-        setToast(false);
+        setFeedbackPlaceholder(null);
       }, 2500);
 
       if (navigator.onLine) {
@@ -49,48 +50,41 @@ export default function OmniCaptureBar() {
   };
 
   return (
-    <div className="relative">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full bg-[#FDF6EA] border border-[#EADBCE] rounded-2xl p-2.5 px-4 flex items-center gap-3 shadow-sm hover:border-[#C27803]/40 transition-all"
-      >
-        {/* Left Lightning Icon */}
-        <div className="w-8 h-8 rounded-xl bg-[#FEF3C7] text-[#C27803] flex items-center justify-center font-bold text-base shrink-0 shadow-inner">
-          ⚡
-        </div>
+    <section className="bg-capture-banner rounded-2xl px-unit-lg py-unit-sm shadow-sm transition-all flex items-center gap-unit-md focus-within:ring-2 focus-within:ring-capture-accent/30 border border-[#EADBCE]">
+      <div className="w-8 h-8 rounded-xl bg-tertiary-fixed text-tertiary flex items-center justify-center shrink-0 shadow-xs">
+        <span className="material-symbols-outlined text-lg text-capture-accent">bolt</span>
+      </div>
 
-        {/* Input Field */}
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Ketik apa saja yang terlintas di kepala lalu tekan Enter untuk simpan ke Inbox..."
-          className="flex-1 bg-transparent text-xs sm:text-sm text-[#19241C] placeholder-[#8A978E] focus:outline-none font-medium"
-        />
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSubmit();
+          }
+        }}
+        placeholder={
+          feedbackPlaceholder ||
+          'Ketik apa saja yang terlintas di kepala lalu tekan Enter untuk simpan ke Inbox...'
+        }
+        className="flex-1 bg-transparent text-[13.5px] text-tertiary placeholder:text-text-muted focus:outline-none"
+      />
 
-        {/* Right Prompt & Button */}
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="hidden sm:inline text-[10px] font-mono text-[#8A978E] bg-[#F6EEDF] px-2 py-0.5 rounded border border-[#EADBCE]">
-            ⏎ Enter
-          </span>
-          <button
-            type="submit"
-            disabled={!text.trim()}
-            className="w-8 h-8 rounded-xl bg-[#351800] hover:bg-[#542a00] text-white flex items-center justify-center text-xs transition-all disabled:opacity-30 active:scale-95 shadow-md"
-            title="Simpan ke Inbox"
-          >
-            ➔
-          </button>
-        </div>
-      </form>
-
-      {/* Floating Micro-Toast Feedback */}
-      {toast && (
-        <div className="absolute -bottom-8 left-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E3B2B] text-white text-[11px] font-semibold shadow-lg animate-fade-in z-20">
-          <span>✓</span>
-          <span>Tersimpan di Inbox</span>
-        </div>
-      )}
-    </div>
+      <div className="flex items-center gap-unit-sm shrink-0">
+        <span className="text-[11px] font-semibold text-text-muted hidden sm:inline-flex items-center gap-0.5 bg-surface-elevated/70 px-unit-xs py-1 rounded-md shadow-xs border border-border-subtle/40">
+          <span className="text-xs">↵</span> Enter
+        </span>
+        <button
+          type="button"
+          onClick={() => handleSubmit()}
+          disabled={!text.trim() || saving}
+          aria-label="Capture item"
+          className="w-8 h-8 rounded-xl bg-tertiary-container hover:bg-primary-container text-white flex items-center justify-center shadow-sm transition-transform active:scale-95 disabled:opacity-40"
+        >
+          <span className="material-symbols-outlined text-sm font-bold">arrow_forward</span>
+        </button>
+      </div>
+    </section>
   );
 }

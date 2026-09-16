@@ -41,7 +41,8 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith('/test-connection') ||
     pathname === '/manifest.json' ||
     pathname === '/sw.js' ||
-    pathname.startsWith('/icons');
+    pathname.startsWith('/icons') ||
+    (process.env.NODE_ENV === 'development' && request.nextUrl.searchParams.get('preview') === '1');
 
   // Jika belum login dan mengakses halaman terproteksi -> redirect ke /login
   if (!user && !isPublicRoute) {

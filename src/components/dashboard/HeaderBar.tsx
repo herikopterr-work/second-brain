@@ -1,99 +1,119 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 
 interface HeaderBarProps {
-  viewMode: 'desktop' | 'mobile';
-  onToggleViewMode: (mode: 'desktop' | 'mobile') => void;
+  viewMode?: 'desktop' | 'mobile';
+  onToggleViewMode?: (mode: 'desktop' | 'mobile') => void;
   userEmail?: string | null;
+  onOpenMobileMenu?: () => void;
 }
 
 export default function HeaderBar({
-  viewMode,
+  viewMode = 'desktop',
   onToggleViewMode,
+  userEmail,
+  onOpenMobileMenu,
 }: HeaderBarProps) {
-  return (
-    <header className="w-full bg-white/90 backdrop-blur-md border-b border-[#DFE6DC] px-6 py-3.5 sticky top-0 z-40 flex items-center justify-between">
-      {/* Left: User Greeting */}
-      <div className="flex items-center gap-3">
-        <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 border border-[#CBD5C8]">
-          <Image
-            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120"
-            alt="Lauren Mitchell"
-            fill
-            className="object-cover"
-            unoptimized
-          />
-        </div>
-        <div>
-          <div className="flex items-center gap-1 font-bold text-sm text-[#19241C]">
-            <span>Lauren Mitchell</span>
-            <span className="text-xs text-emerald-600">✓</span>
-          </div>
-          <div className="text-xs text-[#58655B]">
-            Welcome back to Second Brain 👋
-          </div>
-        </div>
-      </div>
+  const userName = userEmail
+    ? userEmail.split('@')[0].replace('.', ' ').replace(/\b\w/g, (l) => l.toUpperCase())
+    : 'Lauren Mitchell';
 
-      {/* Center: Global Search Bar */}
-      <div className="hidden md:flex items-center relative w-80 lg:w-96">
-        <span className="absolute left-3.5 text-xs text-[#8A978E]">🔍</span>
-        <input
-          type="text"
-          placeholder="Search items, projects, meetings..."
-          className="w-full pl-9 pr-10 py-2 bg-[#F6F8F5] border border-[#DFE6DC] rounded-full text-xs text-[#19241C] placeholder-[#8A978E] focus:outline-none focus:border-[#5B7A66] transition-all shadow-inner"
-        />
-        <span className="absolute right-3 px-1.5 py-0.5 rounded bg-white border border-[#DFE6DC] text-[9px] font-mono text-[#8A978E]">
-          ⌘K
-        </span>
+  const userInitials = userName.slice(0, 2).toUpperCase();
+
+  return (
+    <header className="bg-surface-card rounded-2xl border border-border-subtle shadow-sm flex items-center justify-between px-unit-xl py-unit-md gap-unit-md w-full">
+      {/* User Greeting & Mobile Hamburger */}
+      <div className="flex items-center gap-unit-md min-w-0">
+        {onOpenMobileMenu && (
+          <button
+            type="button"
+            onClick={onOpenMobileMenu}
+            className="lg:hidden p-1.5 rounded-xl bg-surface-container-low text-text-primary hover:bg-surface-container transition-colors flex items-center justify-center"
+            title="Buka Menu"
+          >
+            <span className="material-symbols-outlined text-xl">menu</span>
+          </button>
+        )}
+
+        <div className="w-9 h-9 rounded-full bg-sage-medium text-white flex items-center justify-center font-bold text-xs ring-1 ring-border-strong shrink-0 shadow-xs">
+          {userInitials}
+        </div>
+
+        <div className="flex flex-col min-w-0 leading-tight">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[14px] text-forest-dark font-semibold truncate">{userName}</span>
+            <span className="material-symbols-outlined text-sm text-type-action">check_circle</span>
+          </div>
+          <span className="text-[12px] text-text-secondary truncate">
+            Welcome back to Second Brain 👋
+          </span>
+        </div>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-3">
-        {/* Toggle Mode Desktop vs Mobile Preview */}
-        <div className="flex items-center p-1 bg-[#F6F8F5] border border-[#DFE6DC] rounded-xl text-xs font-semibold">
-          <button
-            onClick={() => onToggleViewMode('desktop')}
-            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              viewMode === 'desktop'
-                ? 'bg-[#162B20] text-white shadow-sm'
-                : 'text-[#58655B] hover:text-[#19241C]'
-            }`}
-          >
-            <span>🖥️</span>
-            <span className="hidden sm:inline">Desktop</span>
-          </button>
-          <button
-            onClick={() => onToggleViewMode('mobile')}
-            className={`px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
-              viewMode === 'mobile'
-                ? 'bg-[#162B20] text-white shadow-sm'
-                : 'text-[#58655B] hover:text-[#19241C]'
-            }`}
-          >
-            <span>📱</span>
-            <span className="hidden sm:inline">Mobile PWA</span>
-          </button>
+      <div className="flex items-center gap-unit-md shrink-0">
+        {/* Global Search Bar */}
+        <div className="relative items-center hidden md:flex">
+          <span className="material-symbols-outlined absolute left-unit-md text-text-muted text-lg pointer-events-none">
+            search
+          </span>
+          <input
+            className="w-64 bg-surface-container-low pl-9 pr-12 py-unit-xs rounded-xl text-[12px] text-text-primary placeholder:text-text-muted focus:outline-none focus:bg-surface-elevated shadow-[0_1px_4px_rgba(0,0,0,0.02)] transition-all"
+            placeholder="Search..."
+            type="text"
+            readOnly
+          />
+          <span className="absolute right-unit-sm text-[11px] font-semibold text-text-muted bg-surface-variant px-unit-xs py-0.5 rounded">
+            ⌘K
+          </span>
         </div>
+
+        {/* View Mode Toggle (Desktop vs Mobile Preview) */}
+        {onToggleViewMode && (
+          <div className="hidden sm:flex items-center p-0.5 bg-surface-container-low border border-border-subtle rounded-xl text-xs font-semibold">
+            <button
+              type="button"
+              onClick={() => onToggleViewMode('desktop')}
+              className={`px-2.5 py-1 rounded-lg transition-all text-[11px] ${
+                viewMode === 'desktop'
+                  ? 'bg-primary-container text-white shadow-xs'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              Desktop
+            </button>
+            <button
+              type="button"
+              onClick={() => onToggleViewMode('mobile')}
+              className={`px-2.5 py-1 rounded-lg transition-all text-[11px] ${
+                viewMode === 'mobile'
+                  ? 'bg-primary-container text-white shadow-xs'
+                  : 'text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              Mobile
+            </button>
+          </div>
+        )}
 
         {/* Notifications */}
         <button
-          className="w-9 h-9 rounded-full bg-[#F6F8F5] border border-[#DFE6DC] hover:border-[#CBD5C8] flex items-center justify-center text-sm text-[#58655B] transition-colors relative"
-          title="Notifikasi"
+          aria-label="Notifications"
+          className="relative w-9 h-9 flex items-center justify-center rounded-xl text-text-secondary hover:bg-surface-container-low hover:text-text-primary transition-all"
+          type="button"
         >
-          <span>🔔</span>
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#DC2626]" />
+          <span className="material-symbols-outlined text-xl">notifications</span>
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-status-critical ring-2 ring-surface-card"></span>
         </button>
 
-        {/* Primary CTA + Capture */}
+        {/* + Capture Action Button */}
         <Link
           href="/capture"
-          className="px-4 py-2 rounded-xl bg-[#072517] hover:bg-[#162B20] text-white font-bold text-xs transition-all shadow-md flex items-center gap-1.5 active:scale-95"
+          className="flex items-center gap-unit-xs bg-primary hover:bg-primary-container text-on-primary px-unit-lg py-unit-xs rounded-xl text-[14px] font-semibold shadow-[0_2px_8px_rgba(7,37,23,0.16)] transition-all active:scale-95"
         >
-          <span>+</span>
-          <span>Capture</span>
+          <span className="material-symbols-outlined text-base">add</span>
+          <span>+ Capture</span>
         </Link>
       </div>
     </header>
